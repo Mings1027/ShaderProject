@@ -35,7 +35,7 @@ public class CameraController : MonoBehaviour
         UpdateCamPosition();
     }
 
-    private void LateUpdate()
+    private void FixedUpdate()
     {
         var desiredPos = followTarget.position + new Vector3(0, offset, -offset);
         var smoothedPos = Vector3.Lerp(transform.position, desiredPos, smoothSpeed * Time.deltaTime);
