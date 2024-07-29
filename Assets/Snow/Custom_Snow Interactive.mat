@@ -38,21 +38,21 @@ Material:
     m_Ints: []
     m_Floats:
     - _MaxTessDistance: 100
-    - _NoiseScale: 0.01
-    - _NoiseWeight: 0.2
-    - _PathBlending: 2
+    - _NoiseScale: 0.015
+    - _NoiseWeight: 0.197
+    - _PathBlending: 3
     - _RimPower: 20
-    - _SnowDepth: 5
-    - _SnowHeight: 0.014
+    - _SnowDepth: 1
+    - _SnowHeight: 1
     - _SnowTextureOpacity: 1
-    - _SnowTextureScale: 0
-    - _SparkCutoff: 0.8
-    - _SparkleScale: 0.3
-    - _Tess: 31.2
+    - _SnowTextureScale: 0.624
+    - _SparkCutoff: 0.46
+    - _SparkleScale: 0.25
+    - _Tess: 64
     m_Colors:
     - _Color: {r: 0.5505073, g: 0.6868825, b: 0.8396226, a: 1}
     - _PathColorIn: {r: 0.064257726, g: 0.23287803, b: 0.7169812, a: 1}
-    - _PathColorOut: {r: 7.129739, g: 7.129739, b: 7.129739, a: 1}
-    - _RimColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+    - _PathColorOut: {r: 14.259475, g: 14.259475, b: 14.259475, a: 1}
+    - _RimColor: {r: 0.254717, g: 0.254717, b: 0.254717, a: 1}
     - _ShadowColor: {r: 0.042452812, g: 0.4273493, b: 1, a: 1}
   m_BuildTextureStacks: []
