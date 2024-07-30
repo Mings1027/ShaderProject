@@ -8,6 +8,9 @@
     #define UNITY_outputcontrolpoints outputcontrolpoints
 #endif
 
+float _Tess; // 테셀레이션 값
+float _MaxTessDistance; // 최대 테셀레이션 거리
+
 struct Varyings
 {
     float3 worldPos : TEXCOORD1; // 월드 좌표
@@ -18,8 +21,6 @@ struct Varyings
     float fogFactor : TEXCOORD4; // 안개 팩터
 };
 
-float _Tess; // 테셀레이션 값
-float _MaxTessDistance; // 최대 테셀레이션 거리
 
 struct TessellationFactors
 {
@@ -51,7 +52,7 @@ ControlPoint hull(InputPatch<ControlPoint, 3> patch, uint id : SV_OutputControlP
     return patch[id]; // 패치의 컨트롤 포인트 반환
 }
 
-TessellationFactors UnityCalcTriEdgeTessFactors(float3 triVertexFactors)
+TessellationFactors CalcTriEdgeTessFactors(float3 triVertexFactors)
 {
     TessellationFactors tess;
     tess.edge[0] = 0.5 * (triVertexFactors.y + triVertexFactors.z); // 엣지 테셀레이션 팩터 계산
@@ -76,7 +77,7 @@ TessellationFactors DistanceBasedTess(float4 v0, float4 v1, float4 v2, float min
     f.y = CalcDistanceTessFactor(v1, minDist, maxDist, tess); // 두 번째 버텍스의 테셀레이션 팩터 계산
     f.z = CalcDistanceTessFactor(v2, minDist, maxDist, tess); // 세 번째 버텍스의 테셀레이션 팩터 계산
 
-    return UnityCalcTriEdgeTessFactors(f); // 테셀레이션 팩터 반환
+    return CalcTriEdgeTessFactors(f); // 테셀레이션 팩터 반환
 }
 
 uniform float3 _Position; // 위치

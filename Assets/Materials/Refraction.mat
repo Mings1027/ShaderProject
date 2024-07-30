@@ -73,7 +73,7 @@ Material:
     - _RefractionSpeed: 0.00625
     - _RefractionStrength: 0.1
     - _ScrollingSpeed: 0.1
-    - _Smoothness: 0
+    - _Smoothness: 1
     - _WaveAmpiltude: 0.05
     - _WaveSpeed: 1
     m_Colors:

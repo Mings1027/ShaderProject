@@ -38,7 +38,7 @@ Material:
     m_Ints: []
     m_Floats:
     - _MaxTessDistance: 100
-    - _NoiseScale: 0.015
+    - _NoiseScale: 0.107
     - _NoiseWeight: 0.197
     - _PathBlending: 3
     - _RimPower: 20
