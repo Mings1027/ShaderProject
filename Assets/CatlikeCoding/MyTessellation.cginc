@@ -1,4 +1,0 @@
-#if !defined(TESSELLATION_INCLUDED)
-#define TESSELLATION_INCLUDED
-#endif
-

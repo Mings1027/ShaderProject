@@ -15,11 +15,11 @@ Shader "Custom/Snow Interactive"
 
         [Space]
         [Header(Snow)]
-        [HDR]_Color("Snow Color", Color) = (0.5,0.5,0.5,1) // 눈 색상
+        [HDR]_SnowColor("Snow Color", Color) = (0.5,0.5,0.5,1) // 눈 색상
         [HDR]_PathColorIn("Snow Path Color In", Color) = (0.5,0.5,0.7,1) // 눈 경로 안쪽 색상
         [HDR]_PathColorOut("Snow Path Color Out", Color) = (0.5,0.5,0.7,1) // 눈 경로 바깥쪽 색상
         _PathBlending("Snow Path Blending", Range(0,3)) = 0.3 // 눈 경로 혼합 비율
-        _MainTex("Snow Texture", 2D) = "white" {} // 눈 텍스처
+        _SnowTexture("Snow Texture", 2D) = "white" {} // 눈 텍스처
         _SnowHeight("Snow Height", Range(0,2)) = 0.3 // 눈 높이
         _SnowDepth("Snow Path Depth", Range(0,10)) = 0.3 // 눈 경로 깊이
         _SnowTextureOpacity("Snow Texture Opacity", Range(0,2)) = 0.3 // 눈 텍스처 불투명도
@@ -77,8 +77,8 @@ Shader "Custom/Snow Interactive"
             #pragma fragment frag // 프래그먼트 셰이더 지정
             #pragma target 4.0 // 셰이더 타겟 버전 설정
             
-            sampler2D _MainTex, _SparkleNoise; // 주 텍스처 및 반짝임 노이즈 샘플러
-            float4 _Color, _RimColor; // 눈 색상 및 림 색상
+            sampler2D _SnowTexture, _SparkleNoise; // 주 텍스처 및 반짝임 노이즈 샘플러
+            float4 _SnowColor, _RimColor; // 눈 색상 및 림 색상
             float _RimPower; // 림 효과 강도
             float4 _PathColorIn, _PathColorOut; // 눈 경로 색상
             float _PathBlending; // 눈 경로 혼합 비율
@@ -105,10 +105,10 @@ Shader "Custom/Snow Interactive"
                 float3 topdownNoise = tex2D(_Noise, IN.worldPos.xz * _NoiseScale).rgb; // 월드 좌표 노이즈 텍스처 샘플링
 
                 // worldspace Snow texture
-                float3 snowtexture = tex2D(_MainTex, IN.worldPos.xz * _SnowTextureScale).rgb; // 월드 좌표 눈 텍스처 샘플링
+                float3 snowtexture = tex2D(_SnowTexture, IN.worldPos.xz * _SnowTextureScale).rgb; // 월드 좌표 눈 텍스처 샘플링
                 
                 //lerp between snow color and snow texture
-                float3 snowTex = lerp(_Color.rgb,snowtexture * _Color.rgb, _SnowTextureOpacity); // 눈 색상과 텍스처 혼합
+                float3 snowTex = lerp(_SnowColor.rgb,snowtexture * _SnowColor.rgb, _SnowTextureOpacity); // 눈 색상과 텍스처 혼합
                 
                 //lerp the colors using the RT effect path 
                 float3 path = lerp(_PathColorOut.rgb * effect.g, _PathColorIn.rgb, saturate(effect.g * _PathBlending)); // 눈 경로 색상 혼합

@@ -21,7 +21,6 @@ struct Varyings
     float fogFactor : TEXCOORD4; // 안개 팩터
 };
 
-
 struct TessellationFactors
 {
     float edge[3] : SV_TessFactor; // 엣지 테셀레이션 팩터
@@ -131,7 +130,7 @@ Varyings vert(Attributes input)
     output.viewDir = SafeNormalize(GetCameraPositionWS() - worldPosition); // 뷰 방향 벡터 계산
 
     // move vertices up where snow is
-    input.vertex.xyz += SafeNormalize(input.normal) * saturate(( _SnowHeight) + (SnowNoise * _NoiseWeight)) * saturate(1-(RTEffect.g * _SnowDepth)); // 눈 높이에 따라 버텍스 이동
+    input.vertex.xyz += SafeNormalize(input.normal) * (( _SnowHeight) + (SnowNoise * _NoiseWeight)) * saturate(1-(RTEffect.g * _SnowDepth)); // 눈 높이에 따라 버텍스 이동
 
     // transform to clip space
     #ifdef SHADERPASS_SHADOWCASTER

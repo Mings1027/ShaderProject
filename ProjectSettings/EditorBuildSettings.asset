@@ -6,6 +6,6 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
-    path: Assets/Scenes/SnowScene.unity
-    guid: 465f0ca15dcd54208999c72bef153ff0
+    path: Assets/Scenes/TessellationScene.unity
+    guid: 27610ebf12bd84e8fa9af1f3863eb96b
   m_configObjects: {}

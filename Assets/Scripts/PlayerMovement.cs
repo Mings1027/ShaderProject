@@ -1,3 +1,4 @@
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -11,12 +12,16 @@ public class PlayerMovement : MonoBehaviour
 
     [SerializeField] private float moveSpeed;
     [SerializeField] private float rotationSpeed = 700f; // 회전 속도
-
+    [SerializeField] private int moveCount;
     private void Awake()
     {
         wallDetector = GetComponent<WallCollisionDetector>();
         rigid = GetComponent<Rigidbody>();
         rigid.freezeRotation = true;
+    }
+    private void Start()
+    {
+        // MovePath().Forget();
     }
     // private void Update()
     // {
@@ -69,5 +74,28 @@ public class PlayerMovement : MonoBehaviour
                 rigid.MoveRotation(Quaternion.RotateTowards(rigid.rotation, targetRotation, rotationSpeed * Time.fixedDeltaTime));
             }
         }
+    }
+
+    private async UniTaskVoid MovePath()
+    {
+        var count = 0;
+        while (count < moveCount)
+        {
+            await UniTask.Delay(1000, cancellationToken: this.GetCancellationTokenOnDestroy());
+            moveDir = new Vector3(1, 0, 0);
+
+            await UniTask.Delay(1000, cancellationToken: this.GetCancellationTokenOnDestroy());
+            moveDir = new Vector3(0, 0, 1);
+
+            await UniTask.Delay(1000, cancellationToken: this.GetCancellationTokenOnDestroy());
+            moveDir = new Vector3(-1, 0, 0);
+
+            await UniTask.Delay(1000, cancellationToken: this.GetCancellationTokenOnDestroy());
+            moveDir = new Vector3(0, 0, -1);
+
+            count++;
+        }
+
+        moveDir = new Vector3(0, 0, 0);
     }
 }
