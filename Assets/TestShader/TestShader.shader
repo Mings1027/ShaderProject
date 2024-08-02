@@ -2,11 +2,19 @@ Shader "Custom/TestShader"
 {
     Properties
     { 
-         _MainTex("Texture", 2D) = "white" {}
-         _MainTex2("Texture2", 2D) = "white" {}
-         _LerpControlTex("LerpTex", 2D) = "white" {}
-         _ZeroToOne("ZeroToOne", Range(0,1)) = 0
+        _MainTex("Texture", 2D) = "white" {}
+        _MainTex2("Texture2", 2D) = "white" {}
     }
+
+    HLSLINCLUDE
+    #pragma target 4.5
+    #pragma vertex vert
+    #pragma fragment frag
+    #pragma multi_compile_instancing
+
+    #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
+    
+    ENDHLSL
 
     SubShader
     {
@@ -14,33 +22,20 @@ Shader "Custom/TestShader"
 
         Pass
         {
-            Name  "URPUnlit"
             Tags {"LightMode" = "SRPDefaultUnlit"}
 
             HLSLPROGRAM
-            #pragma target 4.5
-            // #pragma exclude_renderers gles d3d9
-            #pragma multi_compile_instancing
-            
-            #pragma vertex vert
-            #pragma fragment frag
-
-            #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
-
+    
             CBUFFER_START(UnityPerMaterial)
-                float4 _MainTex_ST;
-                float4 _MainTex2_ST;
-                float4 _LerpControlTex_ST;
-                float _ZeroToOne;
+            float4 _MainTex_ST;
+            float4 _MainTex2_ST;
             CBUFFER_END
             
             TEXTURE2D(_MainTex);
             TEXTURE2D(_MainTex2);
-            TEXTURE2D(_LerpControlTex);
             
             SAMPLER(sampler_MainTex);
             SAMPLER(sampler_MainTex2);
-            SAMPLER(sampler_LerpControlTex);
 
             struct Attributes
             {

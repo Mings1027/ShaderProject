@@ -36,6 +36,7 @@ Shader "Custom/Snow Interactive"
         _RimPower("Rim Power", Range(0,20)) = 20 // 림 효과의 강도
         [HDR]_RimColor("Rim Color Snow", Color) = (0.5,0.5,0.5,1) // 림 색상
     }
+
     HLSLINCLUDE
 
     // Includes
@@ -43,16 +44,21 @@ Shader "Custom/Snow Interactive"
     #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Lighting.hlsl" // 조명 HLSL 라이브러리 포함
     #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Shadows.hlsl" // 그림자 HLSL 라이브러리 포함
     #include "SnowTessellation.hlsl" // Snow Tessellation HLSL 파일 포함
-    #pragma require tessellation tessHW // 테셀레이션 지원 요구
     #pragma vertex TessellationVertexProgram // 테셀레이션 버텍스 프로그램 지정
     #pragma hull hull // Hull 쉐이더 프로그램 지정
     #pragma domain domain // Domain 쉐이더 프로그램 지정
+    #pragma fragment frag // 프래그먼트 셰이더 지정
+    #pragma target 2.0 // 셰이더 타겟 버전 설정
+    
     // Keywords
     
     #pragma multi_compile _ _MAIN_LIGHT_SHADOWS _MAIN_LIGHT_SHADOWS_CASCADE _MAIN_LIGHT_SHADOWS_SCREEN // 다양한 그림자 모드에 대한 다중 컴파일 옵션
     #pragma multi_compile _ _ADDITIONAL_LIGHT_SHADOWS // 추가적인 그림자 모드에 대한 다중 컴파일 옵션
     #pragma multi_compile _ _SHADOWS_SOFT // 부드러운 그림자 모드에 대한 다중 컴파일 옵션
     #pragma multi_compile_fog // 안개 효과에 대한 다중 컴파일 옵션
+    #pragma multi_compile_instancing
+
+    #pragma require tessellation  // 테셀레이션 지원 요구
 
     ControlPoint TessellationVertexProgram(Attributes v)
     {
@@ -73,18 +79,6 @@ Shader "Custom/Snow Interactive"
             Tags { "LightMode" = "UniversalForward" } // 포워드 렌더링 패스
 
             HLSLPROGRAM
-            // vertex happens in snowtessellation.hlsl
-            #pragma fragment frag // 프래그먼트 셰이더 지정
-            #pragma target 4.0 // 셰이더 타겟 버전 설정
-            
-            sampler2D _SnowTexture, _SparkleNoise; // 주 텍스처 및 반짝임 노이즈 샘플러
-            float4 _SnowColor, _RimColor; // 눈 색상 및 림 색상
-            float _RimPower; // 림 효과 강도
-            float4 _PathColorIn, _PathColorOut; // 눈 경로 색상
-            float _PathBlending; // 눈 경로 혼합 비율
-            float _SparkleScale, _SparkCutoff; // 반짝임 스케일 및 컷오프
-            float _SnowTextureOpacity, _SnowTextureScale; // 눈 텍스처 불투명도 및 스케일
-            float4 _ShadowColor; // 그림자 색상
 
             half4 frag(Varyings IN) : SV_Target
             {
@@ -95,17 +89,18 @@ Shader "Custom/Snow Interactive"
                 uv += 0.5; // UV 좌표 보정
 
                 // effects texture				
-                float4 effect = tex2D(_GlobalEffectRT, uv); // 이펙트 텍스처 샘플링
+                float4 effect = _GlobalEffectRT.Sample(sampler_GlobalEffectRT, uv); // 이펙트 텍스처 샘플링
 
                 // mask to prevent bleeding
                 effect *=  smoothstep(0.99, 0.9, uv.x) * smoothstep(0.99, 0.9,1- uv.x); // UV 경계 마스크
                 effect *=  smoothstep(0.99, 0.9, uv.y) * smoothstep(0.99, 0.9,1- uv.y); // UV 경계 마스크
 
                 // worldspace Noise texture
-                float3 topdownNoise = tex2D(_Noise, IN.worldPos.xz * _NoiseScale).rgb; // 월드 좌표 노이즈 텍스처 샘플링
+                float4 noiseSample = _Noise.Sample(sampler_Noise, IN.worldPos.xz * _NoiseScale);
+                float3 topdownNoise = noiseSample.rgb; // 월드 좌표 노이즈 텍스처 샘플링
 
                 // worldspace Snow texture
-                float3 snowtexture = tex2D(_SnowTexture, IN.worldPos.xz * _SnowTextureScale).rgb; // 월드 좌표 눈 텍스처 샘플링
+                float3 snowtexture = _SnowTexture.Sample(sampler_SnowTexture, IN.worldPos.xz * _SnowTextureScale).rgb; // 월드 좌표 눈 텍스처 샘플링
                 
                 //lerp between snow color and snow texture
                 float3 snowTex = lerp(_SnowColor.rgb,snowtexture * _SnowColor.rgb, _SnowTextureOpacity); // 눈 색상과 텍스처 혼합
@@ -138,9 +133,9 @@ Shader "Custom/Snow Interactive"
                 float4 litMainColors = float4(mainColors,1); // 조명 적용 색상
                 extraLights *= litMainColors.rgb; // 추가 조명 적용
                 // add in the sparkles
-                float sparklesStatic = tex2D(_SparkleNoise, IN.worldPos.xz * _SparkleScale).r; // 반짝임 노이즈 샘플링
-                float cutoffSparkles = step(_SparkCutoff,sparklesStatic); // 반짝임 컷오프 적용
-                litMainColors += cutoffSparkles  *saturate(1- (effect.g * 2)) * 4; // 반짝임 효과 추가
+                float sparklesStatic = _SparkleNoise.Sample(sampler_SparkleNoise, IN.worldPos.xz * _SparkleScale).r; // 반짝임 노이즈 샘플링
+                float cutoffSparkles = step(_SparkCutoff, sparklesStatic); // 반짝임 컷오프 적용
+                litMainColors += cutoffSparkles  * saturate(1- (effect.g * 2)) * 4; // 반짝임 효과 추가
                 
                 // add rim light
                 half rim = 1.0 - dot((IN.viewDir), IN.normal) * topdownNoise.r; // 림 라이트 계산

@@ -8,9 +8,6 @@
     #define UNITY_outputcontrolpoints outputcontrolpoints
 #endif
 
-float _Tess; // 테셀레이션 값
-float _MaxTessDistance; // 최대 테셀레이션 거리
-
 struct Varyings
 {
     float3 worldPos : TEXCOORD1; // 월드 좌표
@@ -40,6 +37,38 @@ struct ControlPoint
     float2 uv : TEXCOORD0; // UV 좌표
     float3 normal : NORMAL; // 노멀 벡터
 };
+
+uniform float3 _Position; // 위치
+uniform Texture2D _GlobalEffectRT; // 글로벌 이펙트 텍스처
+uniform SamplerState sampler_GlobalEffectRT;
+uniform float _OrthographicCamSize; // 정사영 카메라 크기
+
+Texture2D _Noise; // 노이즈 텍스처
+SamplerState sampler_Noise;
+Texture2D _SnowTexture;
+SamplerState sampler_SnowTexture;
+Texture2D _SparkleNoise; // 주 텍스처 및 반짝임 노이즈 샘플러
+SamplerState sampler_SparkleNoise;
+
+CBUFFER_START(UnityPerMaterial)
+
+float _NoiseScale, _NoiseWeight; // 노이즈 스케일 값
+float4 _ShadowColor; // 그림자 색상
+
+float _MaxTessDistance; // 최대 테셀레이션 거리
+float _Tess; // 테셀레이션 값
+
+float4 _SnowColor, _PathColorIn, _PathColorOut;
+float _PathBlending; // 눈 경로 혼합 비율
+float _SnowHeight, _SnowDepth; // 노이즈 및 눈 관련 파라미터
+float _SnowTextureOpacity, _SnowTextureScale; // 눈 텍스처 불투명도 및 스케일
+
+float _SparkleScale, _SparkCutoff; // 반짝임 스케일 및 컷오프
+
+float _RimPower; // 림 효과 강도
+float4 _RimColor; // 눈 색상 및 림 색상
+
+CBUFFER_END
 
 [UNITY_domain("tri")]
 [UNITY_outputcontrolpoints(3)]
@@ -79,18 +108,11 @@ TessellationFactors DistanceBasedTess(float4 v0, float4 v1, float4 v2, float min
     return CalcTriEdgeTessFactors(f); // 테셀레이션 팩터 반환
 }
 
-uniform float3 _Position; // 위치
-uniform sampler2D _GlobalEffectRT; // 글로벌 이펙트 텍스처
-uniform float _OrthographicCamSize; // 정사영 카메라 크기
-
-sampler2D _Noise; // 노이즈 텍스처
-float _NoiseScale, _SnowHeight, _NoiseWeight, _SnowDepth; // 노이즈 및 눈 관련 파라미터
 
 TessellationFactors patchConstantFunction(InputPatch<ControlPoint, 3> patch)
 {
     float minDist = 2.0; // 최소 거리
     float maxDist = _MaxTessDistance; // 최대 테셀레이션 거리
-    TessellationFactors f;
     return DistanceBasedTess(patch[0].vertex, patch[1].vertex, patch[2].vertex, minDist, maxDist, _Tess); // 거리 기반 테셀레이션 팩터 계산
 }
 
@@ -120,13 +142,13 @@ Varyings vert(Attributes input)
     uv += 0.5; // UV 좌표 보정
     
     // Effects RenderTexture Reading
-    float4 RTEffect = tex2Dlod(_GlobalEffectRT, float4(uv, 0, 0)); // 이펙트 텍스처 샘플링
+    float4 RTEffect = _GlobalEffectRT.SampleLevel(sampler_GlobalEffectRT, uv, 0); // 이펙트 텍스처 샘플링
     // smoothstep to prevent bleeding
     RTEffect *=  smoothstep(0.99, 0.9, uv.x) * smoothstep(0.99, 0.9,1- uv.x); // UV 경계 마스크
     RTEffect *=  smoothstep(0.99, 0.9, uv.y) * smoothstep(0.99, 0.9,1- uv.y); // UV 경계 마스크
     
     // worldspace noise texture
-    float SnowNoise = tex2Dlod(_Noise, float4(worldPosition.xz * _NoiseScale, 0, 0)).r; // 월드 좌표 노이즈 텍스처 샘플링
+    float SnowNoise = _Noise.SampleLevel(sampler_Noise, worldPosition.xz * _NoiseScale, 0).r;  // 월드 좌표 노이즈 텍스처 샘플링
     output.viewDir = SafeNormalize(GetCameraPositionWS() - worldPosition); // 뷰 방향 벡터 계산
 
     // move vertices up where snow is

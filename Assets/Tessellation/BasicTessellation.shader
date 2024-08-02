@@ -19,6 +19,7 @@ Shader "Custom/Basic Tessellation"
 	#pragma vertex TessellationVertexProgram
 	#pragma hull hull
 	#pragma domain domain   
+	#pragma multi_compile_instancing
 
 	ControlPoint TessellationVertexProgram(Attributes v)
 	{
