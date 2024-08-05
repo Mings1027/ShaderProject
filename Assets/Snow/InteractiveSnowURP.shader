@@ -15,9 +15,9 @@ Shader "Custom/Snow Interactive"
 
         [Space]
         [Header(Snow)]
-        [HDR]_SnowColor("Snow Color", Color) = (0.5,0.5,0.5,1) // 눈 색상
-        [HDR]_PathColorIn("Snow Path Color In", Color) = (0.5,0.5,0.7,1) // 눈 경로 안쪽 색상
-        [HDR]_PathColorOut("Snow Path Color Out", Color) = (0.5,0.5,0.7,1) // 눈 경로 바깥쪽 색상
+        [HDR]_SnowColor("Snow Color", Color) = (0.5, 0.5, 0.5, 1) // 눈 색상
+        [HDR]_PathColorIn("Snow Path Color In", Color) = (0.5, 0.5, 0.7, 1) // 눈 경로 안쪽 색상
+        [HDR]_PathColorOut("Snow Path Color Out", Color) = (0.5, 0.5, 0.7, 1) // 눈 경로 바깥쪽 색상
         _PathBlending("Snow Path Blending", Range(0,3)) = 0.3 // 눈 경로 혼합 비율
         _SnowTexture("Snow Texture", 2D) = "white" {} // 눈 텍스처
         _SnowHeight("Snow Height", Range(0,2)) = 0.3 // 눈 높이
@@ -44,14 +44,14 @@ Shader "Custom/Snow Interactive"
     #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Lighting.hlsl" // 조명 HLSL 라이브러리 포함
     #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Shadows.hlsl" // 그림자 HLSL 라이브러리 포함
     #include "SnowTessellation.hlsl" // Snow Tessellation HLSL 파일 포함
+
     #pragma vertex TessellationVertexProgram // 테셀레이션 버텍스 프로그램 지정
     #pragma hull hull // Hull 쉐이더 프로그램 지정
     #pragma domain domain // Domain 쉐이더 프로그램 지정
-    #pragma fragment frag // 프래그먼트 셰이더 지정
+    #pragma fragment fragment // 프래그먼트 셰이더 지정
     #pragma target 2.0 // 셰이더 타겟 버전 설정
     
     // Keywords
-    
     #pragma multi_compile _ _MAIN_LIGHT_SHADOWS _MAIN_LIGHT_SHADOWS_CASCADE _MAIN_LIGHT_SHADOWS_SCREEN // 다양한 그림자 모드에 대한 다중 컴파일 옵션
     #pragma multi_compile _ _ADDITIONAL_LIGHT_SHADOWS // 추가적인 그림자 모드에 대한 다중 컴파일 옵션
     #pragma multi_compile _ _SHADOWS_SOFT // 부드러운 그림자 모드에 대한 다중 컴파일 옵션
@@ -80,80 +80,85 @@ Shader "Custom/Snow Interactive"
 
             HLSLPROGRAM
 
-            half4 frag(Varyings IN) : SV_Target
+            half4 sample_effect_texture(float2 uv)
             {
-                // Effects RenderTexture Reading
-                float3 worldPosition = mul(unity_ObjectToWorld, IN.vertex).xyz; // 월드 좌표 변환
-                float2 uv = IN.worldPos.xz - _Position.xz; // UV 좌표 계산
-                uv /= (_OrthographicCamSize * 2); // 카메라 크기로 UV 스케일 조정
-                uv += 0.5; // UV 좌표 보정
-
-                // effects texture				
-                float4 effect = _GlobalEffectRT.Sample(sampler_GlobalEffectRT, uv); // 이펙트 텍스처 샘플링
-
-                // mask to prevent bleeding
-                effect *=  smoothstep(0.99, 0.9, uv.x) * smoothstep(0.99, 0.9,1- uv.x); // UV 경계 마스크
-                effect *=  smoothstep(0.99, 0.9, uv.y) * smoothstep(0.99, 0.9,1- uv.y); // UV 경계 마스크
-
-                // worldspace Noise texture
-                float4 noiseSample = _Noise.Sample(sampler_Noise, IN.worldPos.xz * _NoiseScale);
-                float3 topdownNoise = noiseSample.rgb; // 월드 좌표 노이즈 텍스처 샘플링
-
-                // worldspace Snow texture
-                float3 snowtexture = _SnowTexture.Sample(sampler_SnowTexture, IN.worldPos.xz * _SnowTextureScale).rgb; // 월드 좌표 눈 텍스처 샘플링
-                
-                //lerp between snow color and snow texture
-                float3 snowTex = lerp(_SnowColor.rgb,snowtexture * _SnowColor.rgb, _SnowTextureOpacity); // 눈 색상과 텍스처 혼합
-                
-                //lerp the colors using the RT effect path 
-                float3 path = lerp(_PathColorOut.rgb * effect.g, _PathColorIn.rgb, saturate(effect.g * _PathBlending)); // 눈 경로 색상 혼합
-                float3 mainColors = lerp(snowTex,path, saturate(effect.g)); // 주 색상 혼합
-
-                // lighting and shadow information
-                float shadow = 0; // 초기 그림자 값
-                half4 shadowCoord = TransformWorldToShadowCoord(IN.worldPos); // 그림자 좌표 변환
-                
+                float4 effect = _GlobalEffectRT.Sample(sampler_GlobalEffectRT, uv);
+                effect *= smoothstep(0.99, 0.9, uv.x) * smoothstep(0.99, 0.9, 1 - uv.x);
+                effect *= smoothstep(0.99, 0.9, uv.y) * smoothstep(0.99, 0.9, 1 - uv.y);
+                return effect;
+            }
+            
+            float get_shadow_value(Varyings IN)
+            {
+                float shadow = 0;
+                half4 shadowCoord = TransformWorldToShadowCoord(IN.world_pos);
                 #if _MAIN_LIGHT_SHADOWS_CASCADE || _MAIN_LIGHT_SHADOWS
-                    Light mainLight = GetMainLight(shadowCoord); // 주 광원 그림자 포함
-                    shadow = mainLight.shadowAttenuation; // 그림자 감쇠
+                    Light mainLight = GetMainLight(shadowCoord);
+                    shadow = mainLight.shadowAttenuation;
                 #else
-                    Light mainLight = GetMainLight(); // 주 광원
+                    Light mainLight = GetMainLight();
                 #endif
-
-                // extra point lights support
-                float3 extraLights; // 추가 광원
-                int pixelLightCount = GetAdditionalLightsCount(); // 추가 광원 수
-                for (int j = 0; j < pixelLightCount; ++j) 
+                return shadow;
+            }
+            
+            float3 get_extra_lights(Varyings IN)
+            {
+                float3 extra_lights = float3(0, 0, 0);
+                const int pixel_light_count = GetAdditionalLightsCount();
+                for (int j = 0; j < pixel_light_count; ++j)
                 {
-                    Light light = GetAdditionalLight(j, IN.worldPos, half4(1, 1, 1, 1)); // 추가 광원 정보
-                    float3 attenuatedLightColor = light.color * (light.distanceAttenuation * light.shadowAttenuation); // 광원 감쇠
-                    extraLights += attenuatedLightColor;			
+                    const Light light = GetAdditionalLight(j, IN.world_pos, half4(1, 1, 1, 1));
+                    const float3 attenuated_light_color = light.color * (light.distanceAttenuation * light.shadowAttenuation);
+                    extra_lights += attenuated_light_color;
                 }
+                return extra_lights;
+            }
+            
+            float apply_sparkles(Varyings IN, float4 effect)
+            {
+                const float sparkles = _SparkleNoise.Sample(sampler_SparkleNoise, IN.world_pos.xz * _SparkleScale).r;
+                const float cutoff_sparkles = step(_SparkCutoff, sparkles);
+                return cutoff_sparkles * saturate(1 - effect.g * 2) * 4;
+            }
 
-                float4 litMainColors = float4(mainColors,1); // 조명 적용 색상
-                extraLights *= litMainColors.rgb; // 추가 조명 적용
-                // add in the sparkles
-                float sparklesStatic = _SparkleNoise.Sample(sampler_SparkleNoise, IN.worldPos.xz * _SparkleScale).r; // 반짝임 노이즈 샘플링
-                float cutoffSparkles = step(_SparkCutoff, sparklesStatic); // 반짝임 컷오프 적용
-                litMainColors += cutoffSparkles  * saturate(1- (effect.g * 2)) * 4; // 반짝임 효과 추가
-                
-                // add rim light
-                half rim = 1.0 - dot((IN.viewDir), IN.normal) * topdownNoise.r; // 림 라이트 계산
-                litMainColors += _RimColor * pow(abs(rim), _RimPower); // 림 라이트 적용
+            half4 apply_rim_light(Varyings IN, float3 topdown_noise)
+            {
+                const half rim = 1.0 - dot(IN.view_dir, IN.normal) * topdown_noise.r;
+                return _RimColor * pow(abs(rim), _RimPower);
+            }
 
-                // ambient and mainlight colors added
-                half4 extraColors;
-                extraColors.rgb = litMainColors.rgb * mainLight.color.rgb * (shadow + unity_AmbientSky.rgb); // 주변광 및 주 광원 색상 추가
-                extraColors.a = 1; // 불투명도 설정
+            half4 compute_extra_colors(half4 litMainColors, Light mainLight, float shadow)
+            {
+                half4 extra_colors;
+                extra_colors.rgb = litMainColors.rgb * mainLight.color.rgb * (shadow + unity_AmbientSky.rgb);
+                extra_colors.a = 1;
+                return extra_colors;
+            }
+            
+            half4 fragment(Varyings IN) : SV_Target
+            {
+                const float2 uv = (IN.world_pos.xz - _Position.xz) / (_OrthographicCamSize * 2) + 0.5;
+                float4 effect = sample_effect_texture(uv);
+                const float3 topdown_noise = _Noise.Sample(sampler_Noise, IN.world_pos.xz * _NoiseScale).rgb;
+                const float3 snowtexture = _SnowTexture.Sample(sampler_SnowTexture, IN.world_pos.xz * _SnowTextureScale).rgb;
+                const float3 snow_tex = lerp(_SnowColor.rgb,snowtexture * _SnowColor.rgb, _SnowTextureOpacity);
+                const float3 path = lerp(_PathColorOut.rgb * effect.g, _PathColorIn.rgb, saturate(effect.g * _PathBlending));
+                float3 main_colors = lerp(snow_tex,path, saturate(effect.g));
+
+                const float shadow = get_shadow_value(IN);
+                const Light main_light = GetMainLight();
                 
-                // colored shadows
-                float3 coloredShadows = (shadow + (_ShadowColor.rgb * (1-shadow))); // 색상 그림자 계산
-                litMainColors.rgb = litMainColors.rgb * mainLight.color * (coloredShadows); // 색상 그림자 적용
-                // everything together
-                float4 final = litMainColors + extraColors + float4(extraLights,0); // 최종 색상 계산
-                // add in fog
-                final.rgb = MixFog(final.rgb, IN.fogFactor); // 안개 효과 적용
-                return final; // 최종 출력
+                float3 extra_lights = get_extra_lights(IN);
+                float4 lit_main_colors = float4(main_colors,1);
+                extra_lights *= lit_main_colors.rgb;
+                lit_main_colors += apply_sparkles(IN, effect);
+                lit_main_colors += apply_rim_light(IN, topdown_noise);
+                const half4 extra_colors = compute_extra_colors(lit_main_colors, main_light, shadow);
+                const float3 colored_shadows = shadow + _ShadowColor.rgb * (1 - shadow);
+                lit_main_colors.rgb *= main_light.color * colored_shadows;
+                float4 final = lit_main_colors + extra_colors + float4(extra_lights, 0);
+                final.rgb = MixFog(final, IN.fogFactor);
+                return final;
             }
             ENDHLSL
         }

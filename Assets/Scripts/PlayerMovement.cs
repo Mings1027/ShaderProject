@@ -1,35 +1,28 @@
-using Cysharp.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
 public class PlayerMovement : MonoBehaviour
 {
-    public Vector3 GetMoveDir => moveDir;
-
     private Vector3 moveDir;
     private WallCollisionDetector wallDetector;
     private Rigidbody rigid;
+    private PlayerJump playerJump; // PlayerJump 클래스를 참조
 
     [SerializeField] private float moveSpeed;
     [SerializeField] private float rotationSpeed = 700f; // 회전 속도
-    [SerializeField] private int moveCount;
+
     private void Awake()
     {
         wallDetector = GetComponent<WallCollisionDetector>();
         rigid = GetComponent<Rigidbody>();
         rigid.freezeRotation = true;
+
+        playerJump = GetComponent<PlayerJump>(); // PlayerJump 클래스 초기화
     }
-    private void Start()
-    {
-        // MovePath().Forget();
-    }
-    // private void Update()
-    // {
-    //     MovementTransform();
-    // }
+    
     private void FixedUpdate()
     {
-        MovementRigidbody();
+        Movement();
     }
 
     private void OnMove(InputValue value)
@@ -38,27 +31,16 @@ public class PlayerMovement : MonoBehaviour
         moveDir = new Vector3(input.x, 0, input.y).normalized;
     }
 
-    // private void MovementTransform()
-    // {
-    //     if (moveDir != Vector3.zero)
-    //     {
-    //         if (!wallDetector.IsWallInDirection(moveDir))
-    //         {
-    //             var movement = new Vector3(moveDir.x, 0, moveDir.z).normalized;
-    //             var newPosition = transform.position + moveSpeed * Time.deltaTime * movement;
+    private void OnJump(InputValue value)
+    {
+        var input = value.Get<float>();
+        if (Mathf.Approximately(input, 1))
+        {
+            playerJump.TryJump(); // 점프 시도
+        }
+    }
 
-    //             if (movement != Vector3.zero)
-    //             {
-    //                 var targetRotation = Quaternion.LookRotation(movement, Vector3.up);
-    //                 transform.rotation = Quaternion.RotateTowards(transform.rotation, targetRotation, rotationSpeed * Time.deltaTime);
-    //             }
-
-    //             transform.SetPositionAndRotation(newPosition, transform.rotation);
-    //         }
-    //     }
-    // }
-
-    private void MovementRigidbody()
+    private void Movement()
     {
         if (moveDir != Vector3.zero)
         {
@@ -74,28 +56,5 @@ public class PlayerMovement : MonoBehaviour
                 rigid.MoveRotation(Quaternion.RotateTowards(rigid.rotation, targetRotation, rotationSpeed * Time.fixedDeltaTime));
             }
         }
-    }
-
-    private async UniTaskVoid MovePath()
-    {
-        var count = 0;
-        while (count < moveCount)
-        {
-            await UniTask.Delay(1000, cancellationToken: this.GetCancellationTokenOnDestroy());
-            moveDir = new Vector3(1, 0, 0);
-
-            await UniTask.Delay(1000, cancellationToken: this.GetCancellationTokenOnDestroy());
-            moveDir = new Vector3(0, 0, 1);
-
-            await UniTask.Delay(1000, cancellationToken: this.GetCancellationTokenOnDestroy());
-            moveDir = new Vector3(-1, 0, 0);
-
-            await UniTask.Delay(1000, cancellationToken: this.GetCancellationTokenOnDestroy());
-            moveDir = new Vector3(0, 0, -1);
-
-            count++;
-        }
-
-        moveDir = new Vector3(0, 0, 0);
     }
 }

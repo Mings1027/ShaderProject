@@ -39,6 +39,14 @@ Material:
         m_Texture: {fileID: 2800000, guid: f45fe166826be4a8cbbea610692e61d5, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
+    - main_tex:
+        m_Texture: {fileID: 2800000, guid: f256f57840c644591a88866f83724d02, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - main_tex2:
+        m_Texture: {fileID: 2800000, guid: f45fe166826be4a8cbbea610692e61d5, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
     - _LerpControl: 1

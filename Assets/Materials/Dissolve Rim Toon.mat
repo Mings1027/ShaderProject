@@ -123,7 +123,7 @@ Material:
     - _Rim_Brightness: 2.5
     - _Rim_Light_Brightness: 4
     - _Rim_Light_Step: 0.1
-    - _Rim_Power: 10
+    - _Rim_Power: 5
     - _Shadow_Brightness: 1
     - _Shadow_Cutoff: 0.02
     - _Smoothness: 0.5

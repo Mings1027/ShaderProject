@@ -2,8 +2,8 @@ Shader "Custom/TestShader"
 {
     Properties
     { 
-        _MainTex("Texture", 2D) = "white" {}
-        _MainTex2("Texture2", 2D) = "white" {}
+        main_tex("Texture", 2D) = "white" {}
+        main_tex2("Texture2", 2D) = "white" {}
     }
 
     HLSLINCLUDE
@@ -27,15 +27,15 @@ Shader "Custom/TestShader"
             HLSLPROGRAM
     
             CBUFFER_START(UnityPerMaterial)
-            float4 _MainTex_ST;
-            float4 _MainTex2_ST;
+            float4 main_tex_ST;
+            float4 main_tex2_ST;
             CBUFFER_END
             
-            TEXTURE2D(_MainTex);
-            TEXTURE2D(_MainTex2);
+            TEXTURE2D(main_tex);
+            TEXTURE2D(main_tex2);
             
-            SAMPLER(sampler_MainTex);
-            SAMPLER(sampler_MainTex2);
+            SAMPLER(sampler_main_tex);
+            SAMPLER(sampler_main_tex2);
 
             struct Attributes
             {
@@ -65,8 +65,8 @@ Shader "Custom/TestShader"
 
             half4 frag(Varyings input) : SV_Target
             {
-                float4 mainTex2Color = SAMPLE_TEXTURE2D(_MainTex2, sampler_MainTex2, TRANSFORM_TEX(input.uv, _MainTex2));
-                float4 mainTexColor = SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, TRANSFORM_TEX(input.uv, _MainTex) + mainTex2Color.r * 0.5f);
+                float4 mainTex2Color = SAMPLE_TEXTURE2D(main_tex2, sampler_main_tex2, TRANSFORM_TEX(input.uv, main_tex2));
+                float4 mainTexColor = SAMPLE_TEXTURE2D(main_tex, sampler_main_tex, TRANSFORM_TEX(input.uv, main_tex) + mainTex2Color.r * 0.5f);
                 return mainTex2Color;
             }
             

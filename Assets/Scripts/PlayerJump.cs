@@ -1,97 +1,60 @@
-using Cysharp.Threading.Tasks;
 using UnityEngine;
-using UnityEngine.InputSystem;
 
 public class PlayerJump : MonoBehaviour
 {
-    private bool isGround;
+    private Rigidbody rigid;
+    private bool isGrounded;
     private bool isJumping;
-    private Vector3 jumpVelocity;
-    private PlayerMovement playerMovement;
+    private Vector3 velocity;
 
-    [SerializeField] private float jumpForce;
-    [SerializeField] private float gravity = -9.8f;
+    [SerializeField] private ParticleSystem snowParticle;
     [SerializeField] private Transform groundCheck;
-    [SerializeField] private LayerMask groundLayer;
-    [SerializeField, Range(0, 1f)] private float groundCheckRadius = 0.2f;
-    [SerializeField] private ParticleSystem particle;
+    [SerializeField] private float groundDistance = 0.4f;
+    [SerializeField] private LayerMask groundMask;
+    [SerializeField] private float jumpForce = 10f;
+    [SerializeField] private float gravity = 20f;
 
     private void Awake()
     {
-        playerMovement = GetComponent<PlayerMovement>();
+        rigid = GetComponent<Rigidbody>();
+        rigid.useGravity = false;
     }
 
-    private void Update()
+    private void FixedUpdate()
     {
-        isGround = Physics.CheckSphere(groundCheck.position, groundCheckRadius, groundLayer);
-        if (!isGround && !isJumping)
+        CheckGround();
+
+        if (isJumping || !isGrounded)
         {
-            ApplyGravity().Forget();
+            ApplyGravity();
         }
     }
 
-    private void OnJump(InputValue value)
+    public void TryJump()
     {
-        var input = value.Get<float>();
-        if (input == 1 && isGround && !isJumping)
+        if (isGrounded && !isJumping)
         {
-            Jump().Forget();
+            isJumping = true;
+            snowParticle.Stop();
+            velocity.y = Mathf.Sqrt(jumpForce * 2f * gravity);
         }
     }
 
-    private async UniTaskVoid Jump()
+    private void ApplyGravity()
     {
-        particle.Stop();
-        isJumping = true;
+        velocity.y -= gravity * Time.fixedDeltaTime;
+        rigid.MovePosition(rigid.position + velocity.y * Time.fixedDeltaTime * Vector3.up);
 
-        var jumpDirection = playerMovement.GetMoveDir;
-        jumpDirection.y = 1;
-        jumpVelocity = jumpDirection.normalized * jumpForce;
-
-        while (true)
+        if (isGrounded && velocity.y < 0)
         {
-            jumpVelocity.y += gravity * Time.deltaTime;
-            transform.position += jumpVelocity * Time.deltaTime;
-            if (jumpVelocity.y <= 0 && Physics.CheckSphere(groundCheck.position, groundCheckRadius, groundLayer))
-            {
-                particle.Play();
-                isGround = true;
-                isJumping = false;
-                break;
-            }
-
-            await UniTask.Yield(PlayerLoopTiming.FixedUpdate, cancellationToken: this.GetCancellationTokenOnDestroy());
+            isJumping = false;
+            snowParticle.Play();
+            velocity.y = 0f;
         }
     }
 
-    private async UniTaskVoid ApplyGravity()
+    private void CheckGround()
     {
-        isJumping = true;
-        jumpVelocity = Vector3.zero;
-
-        var jumpDirection = playerMovement.GetMoveDir;
-        // jumpDirection.y = 1;
-        jumpVelocity = jumpDirection.normalized;
-
-        while (!isGround)
-        {
-            jumpVelocity.y += gravity * Time.deltaTime;
-            transform.position += jumpVelocity * Time.deltaTime;
-
-            isGround = Physics.CheckSphere(groundCheck.position, groundCheckRadius, groundLayer);
-
-            await UniTask.Yield(PlayerLoopTiming.FixedUpdate, cancellationToken: this.GetCancellationTokenOnDestroy());
-        }
-
-        isJumping = false;
-        particle.Play();
+        isGrounded = Physics.CheckSphere(groundCheck.position, groundDistance, groundMask);
     }
-    private void OnDrawGizmos()
-    {
-        if (groundCheck == null) return;
-
-        Gizmos.color = isGround ? Color.green : Color.red;
-        Gizmos.DrawWireSphere(groundCheck.position, groundCheckRadius);
-    }
-
 }
