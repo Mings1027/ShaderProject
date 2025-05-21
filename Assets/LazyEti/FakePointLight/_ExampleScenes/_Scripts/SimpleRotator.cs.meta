@@ -1,0 +1,18 @@
+fileFormatVersion: 2
+guid: e2a7f84a161ab3543805029e72ca4832
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 283797
+  packageName: Fake Point Light (URP/Built-In)
+  packageVersion: 1.1.5
+  assetPath: Assets/LazyEti/FakePointLight/_ExampleScenes/_Scripts/SimpleRotator.cs
+  uploadId: 742051

@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: d2b11983c1ab18d489407ebaef75c593
+DefaultImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 283797
+  packageName: Fake Point Light (URP/Built-In)
+  packageVersion: 1.1.5
+  assetPath: Assets/LazyEti/FakePointLight/_ExampleScenes/Built-in/PerformanceTest_Built-in.unity
+  uploadId: 742051

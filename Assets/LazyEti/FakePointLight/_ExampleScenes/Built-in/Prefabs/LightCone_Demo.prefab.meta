@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: 2d240e7d33ad93a47b74ccf5a534d227
+PrefabImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 283797
+  packageName: Fake Point Light (URP/Built-In)
+  packageVersion: 1.1.5
+  assetPath: Assets/LazyEti/FakePointLight/_ExampleScenes/Built-in/Prefabs/LightCone_Demo.prefab
+  uploadId: 742051

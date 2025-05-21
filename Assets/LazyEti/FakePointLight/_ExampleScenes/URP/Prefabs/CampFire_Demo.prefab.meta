@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: f5a585e9f4e2ca247bdb8ae48e8d330e
+PrefabImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 283797
+  packageName: Fake Point Light (URP/Built-In)
+  packageVersion: 1.1.5
+  assetPath: Assets/LazyEti/FakePointLight/_ExampleScenes/URP/Prefabs/CampFire_Demo.prefab
+  uploadId: 742051

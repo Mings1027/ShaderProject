@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: a02a2287e500cfe43834958c7dd72a40
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 2100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 283797
+  packageName: Fake Point Light (URP/Built-In)
+  packageVersion: 1.1.5
+  assetPath: Assets/LazyEti/FakePointLight/_ExampleScenes/Built-in/Materials/FakeLight_Particle.mat
+  uploadId: 742051

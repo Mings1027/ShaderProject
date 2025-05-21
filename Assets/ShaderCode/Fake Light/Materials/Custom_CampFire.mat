@@ -1,0 +1,94 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!21 &2100000
+Material:
+  serializedVersion: 8
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: Custom_CampFire
+  m_Shader: {fileID: 4800000, guid: dd90b3f5b699044489719c88348259c2, type: 3}
+  m_Parent: {fileID: 0}
+  m_ModifiedSerializedProperties: 0
+  m_ValidKeywords:
+  - _BLENDMODE_ADDITIVE
+  - _Halo_ON
+  - _SCREENSHADOWS_MEDIUM
+  - _TEXTUREPACKING_RED
+  - ___FLICKERING____ON
+  - ___NOISE____ON
+  m_InvalidKeywords:
+  - DISTANCEFADE_ON
+  - _HALO_ON
+  - ___HALO____ON
+  m_LightmapFlags: 4
+  m_EnableInstancingVariants: 0
+  m_DoubleSidedGI: 0
+  m_CustomRenderQueue: -1
+  stringTagMap: {}
+  disabledShaderPasses: []
+  m_LockedProperties: 
+  m_SavedProperties:
+    serializedVersion: 3
+    m_TexEnvs:
+    - _GradientTexture:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _NoiseTexture:
+        m_Texture: {fileID: 2800000, guid: 32a4c22345786dd43886feb67b1ac7e2, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    m_Ints: []
+    m_Floats:
+    - DistanceFade: 1
+    - Halo: 1
+    - _AccurateColors: 0
+    - _BlendMode: 0
+    - _Blendmode: 0
+    - _CloseFade: 0
+    - _CloseTransition: 0
+    - _DayFading: 0
+    - _DepthWrite: 0
+    - _DistanceFade: 0
+    - _DitherIntensity: 0.5
+    - _DitheringPattern: 0
+    - _DstBlend: 1
+    - _FarFade: 200
+    - _FarTransition: 50
+    - _FlickerIntensity: 0.28
+    - _FlickerSoftness: 0.898
+    - _FlickerSpeed: 1
+    - _Flickering: 0
+    - _Halo: 1
+    - _HaloDepthFade: 1.25
+    - _HaloPosterize: 1
+    - _HaloSize: 1.5
+    - _LightPosterize: 50
+    - _LightSoftness: 0.83
+    - _Noise: 0
+    - _NoiseMovement: 0.35
+    - _NoiseScale: 0.6
+    - _Noisiness: 0.9
+    - _ParticleMode: 0
+    - _RandomOffset: 0
+    - _ReceiveShadows: 1
+    - _ScreenShadows: 2
+    - _ShadingBlend: 0
+    - _ShadingSoftness: 0.252
+    - _ShadowThreshold: 0.5
+    - _SizeFlickering: 0.2
+    - _SpecIntensity: 0.5
+    - _SpecularHighlight: 0
+    - _SrcBlend: 5
+    - _TexturePacking: 0
+    - ___Flickering___: 1
+    - ___Halo___: 1
+    - ___Noise___: 1
+    m_Colors:
+    - _FlickerHue: {r: 1, g: 1, b: 1, a: 1}
+    - _HaloTint: {r: 2.4840214, g: 0.70228875, b: 0, a: 0.42745098}
+    - _LightTint: {r: 2.1185474, g: 0.39730623, b: 0, a: 0.79607844}
+  m_BuildTextureStacks: []
+  m_AllowLocking: 1

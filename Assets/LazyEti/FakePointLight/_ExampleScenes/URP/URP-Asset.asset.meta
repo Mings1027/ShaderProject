@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 15af8ea3c73f646498e669b4574da49c
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 283797
+  packageName: Fake Point Light (URP/Built-In)
+  packageVersion: 1.1.5
+  assetPath: Assets/LazyEti/FakePointLight/_ExampleScenes/URP/URP-Asset.asset
+  uploadId: 742051

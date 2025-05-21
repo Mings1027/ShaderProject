@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 471b3ee7cf72e3744be138ab77da0d9a
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 283797
+  packageName: Fake Point Light (URP/Built-In)
+  packageVersion: 1.1.5
+  assetPath: Assets/LazyEti/FakePointLight/_ExampleScenes/Built-in/Materials/VFX_Smoke.mat
+  uploadId: 742051

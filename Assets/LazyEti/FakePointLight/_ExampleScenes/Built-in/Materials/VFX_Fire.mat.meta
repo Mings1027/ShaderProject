@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: d85bb376bda445f498d0b15820e00bec
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 283797
+  packageName: Fake Point Light (URP/Built-In)
+  packageVersion: 1.1.5
+  assetPath: Assets/LazyEti/FakePointLight/_ExampleScenes/Built-in/Materials/VFX_Fire.mat
+  uploadId: 742051

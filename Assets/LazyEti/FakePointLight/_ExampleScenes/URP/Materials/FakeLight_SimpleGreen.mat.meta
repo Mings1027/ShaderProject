@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 738fc9c7df459f24585a4d99cff71fa9
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 2100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 283797
+  packageName: Fake Point Light (URP/Built-In)
+  packageVersion: 1.1.5
+  assetPath: Assets/LazyEti/FakePointLight/_ExampleScenes/URP/Materials/FakeLight_SimpleGreen.mat
+  uploadId: 742051

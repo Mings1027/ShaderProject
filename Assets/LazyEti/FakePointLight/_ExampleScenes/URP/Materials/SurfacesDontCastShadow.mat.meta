@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: af8bff6bea46f5d4a9404966e9b8a35f
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 2100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 283797
+  packageName: Fake Point Light (URP/Built-In)
+  packageVersion: 1.1.5
+  assetPath: Assets/LazyEti/FakePointLight/_ExampleScenes/URP/Materials/SurfacesDontCastShadow.mat
+  uploadId: 742051

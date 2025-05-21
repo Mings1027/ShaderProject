@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: a7f30fa10307d4046a4431d6202e2109
+PrefabImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 283797
+  packageName: Fake Point Light (URP/Built-In)
+  packageVersion: 1.1.5
+  assetPath: Assets/LazyEti/FakePointLight/_ExampleScenes/URP/Prefabs/Particles Demo.prefab
+  uploadId: 742051

@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 99d067fa27d8f0642a9f0a8ae554a5ae
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 283797
+  packageName: Fake Point Light (URP/Built-In)
+  packageVersion: 1.1.5
+  assetPath: Assets/LazyEti/FakePointLight/_ExampleScenes/URP/Materials/VFX_FireflyTrail.mat
+  uploadId: 742051

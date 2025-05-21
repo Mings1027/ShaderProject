@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 33c2981cf86cc4942a26692123ebf7a0
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 2100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 283797
+  packageName: Fake Point Light (URP/Built-In)
+  packageVersion: 1.1.5
+  assetPath: Assets/LazyEti/FakePointLight/_ExampleScenes/Built-in/Materials/FakeLight_ParticleFirefly.mat
+  uploadId: 742051

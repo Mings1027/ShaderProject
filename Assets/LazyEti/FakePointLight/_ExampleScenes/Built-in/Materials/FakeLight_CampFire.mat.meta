@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 1244f1ad2ccb2af47bb5555252b3be54
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 2100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 283797
+  packageName: Fake Point Light (URP/Built-In)
+  packageVersion: 1.1.5
+  assetPath: Assets/LazyEti/FakePointLight/_ExampleScenes/Built-in/Materials/FakeLight_CampFire.mat
+  uploadId: 742051

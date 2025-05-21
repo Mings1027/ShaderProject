@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 5203936c91eb25543b1e90e61add2f1f
+ShaderImporter:
+  externalObjects: {}
+  defaultTextures: []
+  nonModifiableTextures: []
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 283797
+  packageName: Fake Point Light (URP/Built-In)
+  packageVersion: 1.1.5
+  assetPath: Assets/LazyEti/FakePointLight/Built-in/Shader/BIRP_SpotLight.shader
+  uploadId: 742051

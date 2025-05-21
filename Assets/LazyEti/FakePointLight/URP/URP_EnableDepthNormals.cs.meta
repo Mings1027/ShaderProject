@@ -1,0 +1,18 @@
+fileFormatVersion: 2
+guid: 82cc51333f0afc04b8921b8a6d8e77d1
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 283797
+  packageName: Fake Point Light (URP/Built-In)
+  packageVersion: 1.1.5
+  assetPath: Assets/LazyEti/FakePointLight/URP/URP_EnableDepthNormals.cs
+  uploadId: 742051

@@ -1,0 +1,18 @@
+fileFormatVersion: 2
+guid: 7b3e320f1c4ea5a4386bf07011ab243e
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 283797
+  packageName: Fake Point Light (URP/Built-In)
+  packageVersion: 1.1.5
+  assetPath: Assets/LazyEti/FakePointLight/Assets/Editor/RenderingPipelineDefines.cs
+  uploadId: 742051

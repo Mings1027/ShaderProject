@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: e75dbba8c3f1f424fa68ddfc104d4bdb
+PrefabImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 283797
+  packageName: Fake Point Light (URP/Built-In)
+  packageVersion: 1.1.5
+  assetPath: Assets/LazyEti/FakePointLight/URP/FakeLight_Prefab.prefab
+  uploadId: 742051

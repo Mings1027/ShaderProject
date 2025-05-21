@@ -1,0 +1,17 @@
+fileFormatVersion: 2
+guid: a3a929c6ce1b6c24a86decaf6ab40814
+ShaderImporter:
+  externalObjects: {}
+  defaultTextures: []
+  nonModifiableTextures: []
+  preprocessorOverride: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 283797
+  packageName: Fake Point Light (URP/Built-In)
+  packageVersion: 1.1.5
+  assetPath: Assets/LazyEti/FakePointLight/URP/Shader/URP_FakePointLight.shader
+  uploadId: 742051

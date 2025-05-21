@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: 057cf5d4c11f85940b11bae6f7a65756
+PrefabImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 283797
+  packageName: Fake Point Light (URP/Built-In)
+  packageVersion: 1.1.5
+  assetPath: Assets/LazyEti/FakePointLight/_ExampleScenes/URP/Prefabs/Glow_inst.prefab
+  uploadId: 742051
