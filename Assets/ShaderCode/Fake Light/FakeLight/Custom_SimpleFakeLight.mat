@@ -7,11 +7,12 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: Custom_FakeLightSimplified
-  m_Shader: {fileID: 4800000, guid: 92393bc9516a8495d834c2c570d8251b, type: 3}
+  m_Name: Custom_SimpleFakeLight
+  m_Shader: {fileID: 4800000, guid: 919d4f68aada344f990a68dffaf8a126, type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
-  m_ValidKeywords: []
+  m_ValidKeywords:
+  - _ACCURATECOLORS_ON
   m_InvalidKeywords: []
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
@@ -29,11 +30,16 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
-    - _LightPosterize: 1
+    - _AccurateColors: 1
+    - _DepthWrite: 0
+    - _DstBlend: 1
+    - _IsOrthographic: 0
+    - _LightPosterize: 16
     - _LightSoftness: 1
-    - _ShadingBlend: 0.5
-    - _ShadingSoftness: 0.5
+    - _ShadingBlend: 0.276
+    - _ShadingSoftness: 0.641
+    - _SrcBlend: 1
     m_Colors:
-    - _LightTint: {r: 1, g: 1, b: 1, a: 1}
+    - _LightTint: {r: 4.0015492, g: 4.0015492, b: 4.0015492, a: 1}
   m_BuildTextureStacks: []
   m_AllowLocking: 1

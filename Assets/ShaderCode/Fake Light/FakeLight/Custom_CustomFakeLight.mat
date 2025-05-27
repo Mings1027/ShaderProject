@@ -7,7 +7,7 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: Custom_FakeGradientLight
+  m_Name: Custom_CustomFakeLight
   m_Shader: {fileID: 4800000, guid: 06a9542b206fb47629bb8bc16b772de8, type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
@@ -18,7 +18,7 @@ Material:
   m_InvalidKeywords:
   - _TEXTUREPACKING_RED
   m_LightmapFlags: 4
-  m_EnableInstancingVariants: 0
+  m_EnableInstancingVariants: 1
   m_DoubleSidedGI: 0
   m_CustomRenderQueue: -1
   stringTagMap: {}
@@ -38,31 +38,32 @@ Material:
     m_Ints: []
     m_Floats:
     - _AccurateColors: 1
-    - _CloseFade: 0.9
+    - _CloseFade: 0
     - _CloseTransition: 3.3
     - _DepthWrite: 0
     - _DistanceFade: 1
     - _DstBlend: 1
     - _FarFade: 100
     - _FarTransition: 50
-    - _FlickerIntensity: 1
+    - _FlickerIntensity: 0.533
     - _FlickerSoftness: 1
     - _FlickerSpeed: 1
     - _Flickering: 0
     - _Halo: 1
     - _HaloDepthFade: 0.5
-    - _HaloPosterize: 48
+    - _HaloPosterize: 30
     - _HaloSize: 1.1
-    - _LightPosterize: 64
-    - _LightSoftness: 0.671
+    - _IsOrthographic: 0
+    - _LightPosterize: 28
+    - _LightSoftness: 1
     - _Noise: 0
     - _NoiseMovement: 0.35
     - _NoiseScale: 1
     - _Noisiness: 0.9
     - _RandomOffset: 0
     - _ReceiveShadows: 1
-    - _ShadingBlend: 0.303
-    - _ShadingSoftness: 0.498
+    - _ShadingBlend: 0.276
+    - _ShadingSoftness: 0.641
     - _SizeFlickering: 0.049
     - _SpecIntensity: 0.526
     - _SpecPower: 101
@@ -72,9 +73,10 @@ Material:
     - _TexturePacking: 0
     - ___Flickering___: 0
     m_Colors:
-    - _FlickerTint: {r: 0.9245283, g: 0.048192892, b: 0.039248828, a: 1}
+    - _FlickerTint: {r: 1, g: 1, b: 1, a: 1}
     - _HaloTint: {r: 3.5648687, g: 3.5648687, b: 3.5648687, a: 1}
     - _LightTint: {r: 4.0015492, g: 4.0015492, b: 4.0015492, a: 1}
-    - _SpecularColor: {r: 1, g: 0.10502732, b: 0, a: 1}
+    - _SpecularColor: {r: 1, g: 1, b: 1, a: 1}
+    - _TimeParameters: {r: 2, g: 2, b: 2, a: 2}
   m_BuildTextureStacks: []
   m_AllowLocking: 1

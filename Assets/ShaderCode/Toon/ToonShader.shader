@@ -48,14 +48,14 @@ Shader "Custom/ToonShader"
             {
                 float4 positionOS : POSITION;
                 float3 normalOS : NORMAL;
-                float2 uv : TEXCOORD0;
+                float2 texcoord : TEXCOORD0;
             };
 
             struct Varyings
             {
                 float4 positionCS : SV_POSITION;
                 float3 normalWS : TEXCOORD0;
-                float2 uv : TEXCOORD1;
+                float2 texcoord : TEXCOORD1;
                 float3 worldPos : TEXCOORD2;
             };
 
@@ -84,7 +84,7 @@ Shader "Custom/ToonShader"
                 Varyings output;
                 output.positionCS = TransformObjectToHClip(input.positionOS.xyz);
                 output.normalWS = TransformObjectToWorldNormal(input.normalOS);
-                output.uv = input.uv;
+                output.texcoord = input.texcoord;
                 output.worldPos = TransformObjectToWorld(input.positionOS.xyz);
 
                 return output;
@@ -92,7 +92,7 @@ Shader "Custom/ToonShader"
 
             half4 frag(Varyings input) : SV_Target
             {
-                half2 baseMapUV = input.uv * _BaseMap_ST.xy + _BaseMap_ST.zw;
+                half2 baseMapUV = input.texcoord * _BaseMap_ST.xy + _BaseMap_ST.zw;
                 half4 baseColor = SAMPLE_TEXTURE2D(_BaseMap, sampler_BaseMap, baseMapUV) * _Color;
 
                 half4 shadowCoord = TransformWorldToShadowCoord(input.worldPos);

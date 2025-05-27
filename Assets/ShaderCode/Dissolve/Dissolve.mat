@@ -46,9 +46,9 @@ Material:
     - _Smoothness: 0.5
     - _TotalBrightness: 0.488
     m_Colors:
-    - _BaseColor: {r: 1, g: 1, b: 1, a: 1}
+    - _BaseColor: {r: 1, g: 0, b: 0, a: 1}
     - _DissolveColor: {r: 36.83019, g: 36.83019, b: 36.83019, a: 0}
-    - _EmissionColor: {r: 1.8275257, g: 0.7529398, b: 47.937256, a: 0}
+    - _EmissionColor: {r: 29.846159, g: 5.304191, b: 74.96591, a: 0}
     - _ToonRampTinting: {r: 1, g: 1, b: 1, a: 1}
   m_BuildTextureStacks: []
   m_AllowLocking: 1

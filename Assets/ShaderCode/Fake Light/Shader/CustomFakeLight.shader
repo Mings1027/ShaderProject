@@ -1,4 +1,4 @@
-Shader "Custom/FakeLightWithHalo"
+Shader "Custom/CustomFakeLight"
 {
     Properties
     {
@@ -41,6 +41,7 @@ Shader "Custom/FakeLightWithHalo"
         [IntRange]_SpecPower("Spec Power", Range(0, 200)) = 100
 
         [Space(15)][Toggle(_ACCURATECOLORS_ON)] _AccurateColors("Accurate Colors", Float) = 0
+        [Toggle(_IS_ORTHOGRAPHIC)] _IsOrthographic("Is Orthographic", Float) = 0
 
         [Space(25)]_RandomOffset("RandomOffset", Range( 0 , 1000)) = 0
 
@@ -64,9 +65,6 @@ Shader "Custom/FakeLightWithHalo"
         HLSLINCLUDE
         #pragma target 4.5
         #pragma prefer_hlslcc gles
-
-        #include "Packages/com.unity.render-pipelines.core/ShaderLibrary/Common.hlsl"
-        #include "Packages/com.unity.render-pipelines.core/ShaderLibrary/Filtering.hlsl"
         ENDHLSL
 
         Pass
@@ -86,12 +84,6 @@ Shader "Custom/FakeLightWithHalo"
 
             HLSLPROGRAM
             #pragma multi_compile_instancing
-            // #define _SURFACE_TYPE_TRANSPARENT 1
-            // #define ASE_VERSION 19801
-            // #define ASE_SRP_VERSION 100400
-            #define REQUIRE_DEPTH_TEXTURE 1
-            #define REQUIRE_OPAQUE_TEXTURE 1
-            // #define ASE_USING_SAMPLING_MACROS 1
 
             #pragma shader_feature_local _Halo_ON
             #pragma shader_feature_local _DISTANCE_ON
@@ -99,14 +91,13 @@ Shader "Custom/FakeLightWithHalo"
             #pragma shader_feature_local _NOISE_ON
             #pragma shader_feature_local _SPECULARHIGHLIGHT_ON
             #pragma shader_feature_local _ACCURATECOLORS_ON
+            #pragma shader_feature_local _IS_ORTHOGRAPHIC
 
             #pragma vertex vert
             #pragma fragment frag
 
-            #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
-            #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Lighting.hlsl"
-            #include "Packages/com.unity.render-pipelines.core/ShaderLibrary/UnityInstancing.hlsl"
-            #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/ShaderGraphFunctions.hlsl"
+            #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/DeclareDepthTexture.hlsl"
+            #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/DeclareOpaqueTexture.hlsl"
 
             struct Attributes
             {
@@ -205,7 +196,7 @@ Shader "Custom/FakeLightWithHalo"
 
                 return flickerAlpha;
             }
-            
+
             float CalculateDistanceFade(float3 objectPos)
             {
                 #ifdef _DISTANCE_ON
@@ -221,15 +212,12 @@ Shader "Custom/FakeLightWithHalo"
 
             float CalculateDepthScale(float3 objectPos)
             {
-                if (unity_OrthoParams.w == 1)
-                {
-                    return unity_OrthoParams.y;
-                }
-                else
-                {
-                    float distanceToCam = distance(_WorldSpaceCameraPos, objectPos);
-                    return distanceToCam / -UNITY_MATRIX_P[1][1];
-                }
+                #ifdef _IS_ORTHOGRAPHIC
+                return unity_OrthoParams.y;
+                #else
+                float distanceToCam = distance(_WorldSpaceCameraPos, objectPos);
+                return distanceToCam / -UNITY_MATRIX_P[1][1];
+                #endif
             }
 
             PackedVaryings VertexFunction(Attributes input)
@@ -275,48 +263,43 @@ Shader "Custom/FakeLightWithHalo"
             {
                 float4 screenPos = ComputeScreenPos(clipPos);
                 float4 clipToScreenPos = screenPos / screenPos.w;
-                clipToScreenPos.z = UNITY_NEAR_CLIP_VALUE >= 0
-                                        ? clipToScreenPos.z
-                                        : clipToScreenPos.z * 0.5 + 0.5;
                 return clipToScreenPos;
             }
 
             float3 ScreenWorldPosition(float3 worldPos, float4 clipToScreenPos, float3 viewDirection)
             {
-                if (unity_OrthoParams.w == 1)
-                {
-                    float sceneDepth = SHADERGRAPH_SAMPLE_SCENE_DEPTH(clipToScreenPos.xy);
+                #ifdef _IS_ORTHOGRAPHIC
 
-                    #ifdef UNITY_REVERSED_Z
-                    float normalizedDepth = 1.0 - sceneDepth;
-                    #else
+                float sceneDepth = SampleSceneDepth(clipToScreenPos.xy);
+
+                #ifdef UNITY_REVERSED_Z
+                float normalizedDepth = 1.0 - sceneDepth;
+                #else
                     float normalizedDepth = sceneDepth;
-                    #endif
+                #endif
 
-                    float interpolatedDepth = lerp(_ProjectionParams.y, _ProjectionParams.z, normalizedDepth);
-                    float3 worldToViewPos = mul(UNITY_MATRIX_V, float4(worldPos, 1)).xyz;
-                    float3 reconstructedViewPos = float3(worldToViewPos.x, worldToViewPos.y, -interpolatedDepth);
-                    return mul(UNITY_MATRIX_I_V, float4(reconstructedViewPos, 1.0)).xyz;
-                }
-                else
-                {
-                    float linearDepth
-                        = LinearEyeDepth(SHADERGRAPH_SAMPLE_SCENE_DEPTH(clipToScreenPos.xy), _ZBufferParams);
+                float interpolatedDepth = lerp(_ProjectionParams.y, _ProjectionParams.z, normalizedDepth);
+                float3 worldToViewPos = mul(UNITY_MATRIX_V, float4(worldPos, 1)).xyz;
+                float3 reconstructedViewPos = float3(worldToViewPos.x, worldToViewPos.y, -interpolatedDepth);
+                return mul(UNITY_MATRIX_I_V, float4(reconstructedViewPos, 1.0)).xyz;
+                #else
+                float linearDepth
+                    = LinearEyeDepth(SampleSceneDepth(clipToScreenPos.xy), _ZBufferParams);
 
-                    float4x4 worldToObjMatrix = GetWorldToObjectMatrix();
+                float4x4 worldToObjMatrix = GetWorldToObjectMatrix();
 
-                    // (world->obj) x (view->world) = (view->obj)
-                    float4x4 viewToObjMatrix = mul(worldToObjMatrix, UNITY_MATRIX_I_V);
+                // (world->obj) x (view->world) = (view->obj)
+                float4x4 viewToObjMatrix = mul(worldToObjMatrix, UNITY_MATRIX_I_V);
 
-                    float4x4 objToWorldMatrix = GetObjectToWorldMatrix();
-                    float3 zAxisDirection = transpose(viewToObjMatrix)[2].xyz;
+                float4x4 objToWorldMatrix = GetObjectToWorldMatrix();
+                float3 zAxisDirection = transpose(viewToObjMatrix)[2].xyz;
 
 
-                    float3 objToWorldDir = mul(objToWorldMatrix, float4(zAxisDirection, 0.0)).xyz;
-                    float viewObjDot = dot(viewDirection, -objToWorldDir);
+                float3 objToWorldDir = mul(objToWorldMatrix, float4(zAxisDirection, 0.0)).xyz;
+                float viewObjDot = dot(viewDirection, -objToWorldDir);
 
-                    return linearDepth * (viewDirection / viewObjDot) + _WorldSpaceCameraPos;
-                }
+                return linearDepth * (viewDirection / viewObjDot) + _WorldSpaceCameraPos;
+                #endif
             }
 
             inline float Dither8x8Bayer(int x, int y)
@@ -356,27 +339,26 @@ Shader "Custom/FakeLightWithHalo"
             float CalculateNoise(float3 worldNormal, float3 worldPos)
             {
                 #ifdef _NOISE_ON
-
                 float3 normalPow = pow(abs(worldNormal), 3);
                 float normalSum = normalPow.x + normalPow.y + normalPow.z;
                 float3 saturateNorm = saturate(normalPow) / normalSum;
 
                 float3 noiseUV = worldPos * 0.1 * _NoiseScale;
 
-                float2 uv1 = lerp(noiseUV.xz, noiseUV.yz * 0.9,
-                                      round((1.0 - saturateNorm.x) * saturateNorm.x * saturateNorm.x));
+                float uv1Factor = round((1.0 - saturateNorm.x) * saturateNorm.x * saturateNorm.x);
+                float2 uv1 = lerp(noiseUV.xz, noiseUV.yz * 0.9, uv1Factor);
 
-                float2 uv2 = lerp(uv1, noiseUV.xy * 0.94,
-                                      round(saturateNorm.z  * (saturateNorm.z * (1.0 - saturateNorm.z))));
+                float uv2Factor = round(saturateNorm.z * (saturateNorm.z * (1.0 - saturateNorm.z)));
+                float2 uv2 = lerp(uv1, noiseUV.xy * 0.94, uv2Factor);
 
                 float noiseTime = _TimeParameters.x * ((_NoiseMovement + _RandomOffset * 0.1) * 0.2);
                 float noisePhase = noiseTime + _RandomOffset * PI;
 
-                float4 noiseSampleA = SAMPLE_TEXTURE2D(_NoiseTexture, sampler_NoiseTexture,
-                    (uv2 + (noisePhase * float2(1.02,0.87))));
+                float2 sampleACoord = uv2 + noisePhase * float2(1.02, 0.87);
+                float4 noiseSampleA = SAMPLE_TEXTURE2D(_NoiseTexture, sampler_NoiseTexture, sampleACoord);
 
-                float4 noiseSampleB = SAMPLE_TEXTURE2D(_NoiseTexture, sampler_NoiseTexture,
-                    (uv2 * 0.7 + (noisePhase * float2(-0.72 ,-0.67))));
+                float2 sampleBCoord = uv2 * 0.7 + noisePhase * float2(-0.72, -0.67);
+                float4 noiseSampleB = SAMPLE_TEXTURE2D(_NoiseTexture, sampler_NoiseTexture, sampleBCoord);
 
                 #if defined( _TEXTUREPACKING_RED )
                 float noiseSampleValue = noiseSample2.r;
@@ -413,7 +395,7 @@ Shader "Custom/FakeLightWithHalo"
                 float brightnessSum = smoothStepValue + brightnessBoost;
                 float lightPosterize = 256.0 / _LightPosterize;
                 float posterizedBrightness = saturate(floor(brightnessSum * lightPosterize) / lightPosterize);
-                return smoothStepValue * (_LightPosterize <= 0.0 ? brightnessSum : posterizedBrightness);
+                return smoothStepValue * lerp(brightnessSum, posterizedBrightness, step(1.0, _LightPosterize));
             }
 
             float CalculateLightMask(float gradientMask, float3 lightDir, float3 worldNormal, float noiseFactor)
@@ -423,35 +405,15 @@ Shader "Custom/FakeLightWithHalo"
                 float lightDotNormal = dot(lightDir, worldNormal);
                 float smoothLight = smoothstep(0.0, _ShadingSoftness, saturate(lightDotNormal * noiseFactor));
                 float posterizedLight = saturate(floor(smoothLight * posterization) / posterization);
-                return saturate((inverseGradient <= 0.0 ? smoothLight : posterizedLight) + _ShadingBlend);
-            }
-
-            half CalculateLightIntensity(float disFromCenter, float noiseFactor, float3 lightDir, float3 worldNormal)
-            {
-                float lightSoftness = (1.0 - _LightSoftness * 1.1) * 0.5;
-                float smoothStepValue
-                    = smoothstep(lightSoftness, 1.0 - lightSoftness, disFromCenter * (disFromCenter + noiseFactor));
-                float brightnessBoost = saturate(pow(disFromCenter, 30.0));
-                float brightnessSum = smoothStepValue + brightnessBoost;
-                float lightPosterize = 256.0 / _LightPosterize;
-                float posterizedBrightness = saturate(floor(brightnessSum * lightPosterize) / lightPosterize);
-                float gradientMask = smoothStepValue * (_LightPosterize <= 0.0 ? brightnessSum : posterizedBrightness);
-                float inverseGradient = 1.0 - gradientMask;
-                float posterization = 256.0 / inverseGradient;
-                float lightDotNormal = dot(lightDir, worldNormal);
-                float smoothLight = smoothstep(0.0, _ShadingSoftness, saturate(lightDotNormal * noiseFactor));
-                float posterizedLight = saturate(floor(smoothLight * posterization) / posterization);
-                float lightMask = saturate((inverseGradient <= 0.0 ? smoothLight : posterizedLight) + _ShadingBlend);
-                float surfaceMask = step(0.01, disFromCenter);
-
-                return gradientMask * lightMask * surfaceMask;
+                float lerpLight = lerp(smoothLight, posterizedLight, step(1.0, inverseGradient));
+                return saturate(lerpLight + _ShadingBlend);
             }
 
             float3 CalculateSpecLight(float3 viewDirection, float3 lightDir, float3 worldNormal, float lightIntensity)
             {
                 #ifdef _SPECULARHIGHLIGHT_ON
                 float LdotN = dot(normalize(viewDirection + lightDir), worldNormal * float3(1, 0.99, 1));
-                float specFactor = pow(saturate(LdotN) , _SpecPower) * _SpecIntensity * lightIntensity;
+                float specFactor = pow(saturate(LdotN), _SpecPower) * _SpecIntensity * lightIntensity;
                 return _SpecularColor.rgb * specFactor;
                 #else
                 return 0.0;
@@ -459,7 +421,7 @@ Shader "Custom/FakeLightWithHalo"
             }
 
             float3 ComputeHaloColor(PackedVaryings input, float3 objectPos, float4 clipToScreenPos, float3 worldPos,
-                float noiseFactor)
+            float noiseFactor)
             {
                 #ifdef _Halo_ON
                 float haloSize = input.texcoord3.w;
@@ -489,7 +451,7 @@ Shader "Custom/FakeLightWithHalo"
             half3 CalculateAccurateColor(float3 lightColor, half4 clipToScreenPos, half gradientMask)
             {
                 #ifdef _ACCURATECOLORS_ON
-                float4 pixelScreenColor = float4(SHADERGRAPH_SAMPLE_SCENE_COLOR(clipToScreenPos.xy), 1.0);
+                float4 pixelScreenColor = float4(SampleSceneColor(clipToScreenPos.xy), 1.0);
                 float3 accuratePower = abs(pixelScreenColor.rgb);
                 return lightColor * 4 * pow(accuratePower, saturate(0.8 - 0.4 * gradientMask));
                 #else
@@ -528,7 +490,7 @@ Shader "Custom/FakeLightWithHalo"
                 float gradientMask = CalculateGradientMask(localSilhouette, noiseFactor);
 
                 float lightMask = CalculateLightMask(gradientMask, lightDir, worldNormal, noiseFactor);
-                
+
                 float surfaceMask = step(0.01, localSilhouette);
 
                 half lightIntensity = gradientMask * lightMask * surfaceMask;
@@ -548,7 +510,7 @@ Shader "Custom/FakeLightWithHalo"
                 float distanceFade = input.texcoord2.y;
 
                 float3 finalColor = (accurateColor + haloColor) * input.texcoord3.xyz * distanceFade * flickerAlpha;
-                
+
                 return half4(finalColor, 1);
             }
             ENDHLSL
