@@ -3,6 +3,7 @@ Shader "Custom/CustomFakeLight"
     Properties
     {
         [NoScaleOffset][SingleLineTexture]_GradientTexture("Gradient Texture", 2D) = "white" {}
+        _EffectScale("Effect Scale", Range(0, 1)) = 0.5
         [HDR]_LightTint("Light Tint", Color) = (1, 1, 1, 1)
         _LightSoftness("Light Softness", Range(0 ,1)) = 1
         [IntRange]_LightPosterize("Light Posterize", Range(0 ,128)) = 1
@@ -46,6 +47,8 @@ Shader "Custom/CustomFakeLight"
         [Space(25)]_RandomOffset("RandomOffset", Range( 0 , 1000)) = 0
 
         [Enum(Default,0, Off,1, On,2)][Space(5)]_DepthWrite("Depth Write", Float) = 0
+
+        [Space(15)][KeywordEnum(Additive,Contrast,Negative)] _BlendMode("Blend Mode", Float) = 0
         [HideInInspector][IntRange]_SrcBlend("SrcBlend", Range(0 ,12)) = 1
         [HideInInspector][IntRange]_DstBlend("DstBlend", Range(0 ,12)) = 1
     }
@@ -92,6 +95,8 @@ Shader "Custom/CustomFakeLight"
             #pragma shader_feature_local _SPECULARHIGHLIGHT_ON
             #pragma shader_feature_local _ACCURATECOLORS_ON
             #pragma shader_feature_local _IS_ORTHOGRAPHIC
+            #pragma shader_feature_local _BLENDMODE_ADDITIVE _BLENDMODE_CONTRAST _BLENDMODE_NEGATIVE
+
 
             #pragma vertex vert
             #pragma fragment frag
@@ -120,6 +125,7 @@ Shader "Custom/CustomFakeLight"
             };
 
             CBUFFER_START(UnityPerMaterial)
+                float _EffectScale;
                 float4 _LightTint;
                 float _LightSoftness;
                 float _LightPosterize;
@@ -178,7 +184,7 @@ Shader "Custom/CustomFakeLight"
                 return n;
             }
 
-            float CalculateFlickerAlpha()
+            float CalculateFlicker()
             {
                 #ifdef _FLICKERING_ON
                 float flickerTime = _TimeParameters.x * ((_FlickerSpeed + _RandomOffset * 0.1) * 4);
@@ -246,9 +252,9 @@ Shader "Custom/CustomFakeLight"
 
                 output.texcoord2.w = step(0.0, dot(safeViewDir, _WorldSpaceCameraPos - objectPosition));
 
-                float flickerAlpha = CalculateFlickerAlpha();
-                float flickerSize = 1.0 - _SizeFlickering + flickerAlpha * (1.0 - (1.0 - _SizeFlickering));
-                output.texcoord3.xyz = lerp(_FlickerTint, float3(1, 1, 1), flickerAlpha * flickerAlpha);
+                float flicker = CalculateFlicker();
+                float flickerSize = 1.0 - _SizeFlickering + flicker * (1.0 - (1.0 - _SizeFlickering));
+                output.texcoord3.xyz = lerp(_FlickerTint, float3(1, 1, 1), flicker * flicker);
                 output.texcoord3.w = _HaloSize * flickerSize * 0.5;
 
                 return output;
@@ -383,7 +389,7 @@ Shader "Custom/CustomFakeLight"
             float ComputeLocalSilhouette(float3 localPos, float maxScale, float3 flickerAlpha)
             {
                 float flickerMagnitude = 1.0 - _SizeFlickering + flickerAlpha * (1.0 - (1.0 - _SizeFlickering));
-                return saturate(1.0 - length(localPos) / (maxScale * flickerMagnitude * 0.45));
+                return saturate(1.0 - length(localPos) / (maxScale * flickerMagnitude * _EffectScale));
             }
 
             float CalculateGradientMask(float localSilhouette, float noiseFactor)
@@ -421,7 +427,7 @@ Shader "Custom/CustomFakeLight"
             }
 
             float3 ComputeHaloColor(PackedVaryings input, float3 objectPos, float4 clipToScreenPos, float3 worldPos,
-            float noiseFactor)
+                        float noiseFactor)
             {
                 #ifdef _Halo_ON
                 float haloSize = input.texcoord3.w;
@@ -474,20 +480,19 @@ Shader "Custom/CustomFakeLight"
 
                 float3 localPos = screenToWorldPos - objectPosition;
 
-                float4 normalSample = NormalTex(clipToScreenPos.xy);
-                float3 worldNormal = normalSample.xyz;
+                float3 worldNormal = NormalTex(clipToScreenPos.xy).xyz;
 
                 float noiseFactor = CalculateNoise(worldNormal, screenToWorldPos);
 
                 float maxScale = GetMaxScale();
 
-                float3 flickerAlpha = CalculateFlickerAlpha();
+                float3 flicker = CalculateFlicker();
 
-                float localSilhouette = ComputeLocalSilhouette(localPos, maxScale, flickerAlpha);
-
-                float3 lightDir = normalize(-localPos);
+                float localSilhouette = ComputeLocalSilhouette(localPos, maxScale, flicker);
 
                 float gradientMask = CalculateGradientMask(localSilhouette, noiseFactor);
+
+                float3 lightDir = normalize(-localPos);
 
                 float lightMask = CalculateLightMask(gradientMask, lightDir, worldNormal, noiseFactor);
 
@@ -495,27 +500,38 @@ Shader "Custom/CustomFakeLight"
 
                 half lightIntensity = gradientMask * lightMask * surfaceMask;
 
-                float3 specColor = CalculateSpecLight(viewDirection, lightDir, worldNormal, lightIntensity);
-
-                float4 sample = SAMPLE_TEXTURE2D(_GradientTexture, sampler_GradientTexture, 1 - lightIntensity)
+                float4 sampleTexture = SAMPLE_TEXTURE2D(_GradientTexture, sampler_GradientTexture, 1 - lightIntensity)
                     * _LightTint * input.color;
 
-                float3 lightColor = sample.rgb * (sample.a * lightIntensity * 0.1) + specColor;
+                float3 specColor = CalculateSpecLight(viewDirection, lightDir, worldNormal, lightIntensity);
+
+                float3 lightColor = sampleTexture.rgb * (sampleTexture.a * lightIntensity * 0.1) + specColor;
 
                 float3 accurateColor = CalculateAccurateColor(lightColor, clipToScreenPos, gradientMask);
 
                 float3 haloColor = ComputeHaloColor(input, objectPosition, clipToScreenPos, screenToWorldPos,
-                    noiseFactor);
+            noiseFactor);
 
                 float distanceFade = input.texcoord2.y;
 
-                float3 finalColor = (accurateColor + haloColor) * input.texcoord3.xyz * distanceFade * flickerAlpha;
+                float3 finalColor = (accurateColor + haloColor) * input.texcoord3.xyz * distanceFade * flicker;
 
+                #if defined(_BLENDMODE_ADDITIVE)
+                
+                #elif defined(_BLENDMODE_CONTRAST)
+                
+                #elif defined(_BLENDMODE_NEGATIVE)
+                finalColor = 1.0 - saturate(finalColor);
+                #else
+                #endif
+                
                 return half4(finalColor, 1);
             }
             ENDHLSL
         }
     }
+
+    CustomEditor "ShaderCode.FPL.FakeLightEditor"
     Fallback "Hidden/InternalErrorShader"
 
 }

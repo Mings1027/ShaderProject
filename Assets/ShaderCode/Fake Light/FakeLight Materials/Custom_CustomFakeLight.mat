@@ -13,6 +13,7 @@ Material:
   m_ModifiedSerializedProperties: 0
   m_ValidKeywords:
   - _ACCURATECOLORS_ON
+  - _BLENDMODE_ADDITIVE
   - _DISTANCE_ON
   - _Halo_ON
   m_InvalidKeywords:
@@ -38,11 +39,13 @@ Material:
     m_Ints: []
     m_Floats:
     - _AccurateColors: 1
+    - _BlendMode: 0
     - _CloseFade: 0
     - _CloseTransition: 3.3
     - _DepthWrite: 0
     - _DistanceFade: 1
     - _DstBlend: 1
+    - _EffectScale: 0.5
     - _FarFade: 100
     - _FarTransition: 50
     - _FlickerIntensity: 0.533
@@ -51,10 +54,10 @@ Material:
     - _Flickering: 0
     - _Halo: 1
     - _HaloDepthFade: 0.5
-    - _HaloPosterize: 30
-    - _HaloSize: 1.1
+    - _HaloPosterize: 0
+    - _HaloSize: 1.06
     - _IsOrthographic: 0
-    - _LightPosterize: 28
+    - _LightPosterize: 0
     - _LightSoftness: 1
     - _Noise: 0
     - _NoiseMovement: 0.35
@@ -68,14 +71,14 @@ Material:
     - _SpecIntensity: 0.526
     - _SpecPower: 101
     - _SpecularHighlight: 0
-    - _SrcBlend: 1
+    - _SrcBlend: 5
     - _Test: 0
     - _TexturePacking: 0
     - ___Flickering___: 0
     m_Colors:
     - _FlickerTint: {r: 1, g: 1, b: 1, a: 1}
-    - _HaloTint: {r: 3.5648687, g: 3.5648687, b: 3.5648687, a: 1}
-    - _LightTint: {r: 4.0015492, g: 4.0015492, b: 4.0015492, a: 1}
+    - _HaloTint: {r: 4.3552814, g: 1.7205669, b: 0.76011986, a: 1}
+    - _LightTint: {r: 4.4855857, g: 1.9466946, b: 1.0790795, a: 1}
     - _SpecularColor: {r: 1, g: 1, b: 1, a: 1}
     - _TimeParameters: {r: 2, g: 2, b: 2, a: 2}
   m_BuildTextureStacks: []

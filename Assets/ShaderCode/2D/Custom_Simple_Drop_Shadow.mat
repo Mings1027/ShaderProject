@@ -7,8 +7,8 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: RimShader
-  m_Shader: {fileID: 4800000, guid: 99939d4bc7a054b63afd0db5ad1790db, type: 3}
+  m_Name: Custom_Simple_Drop_Shadow
+  m_Shader: {fileID: 4800000, guid: 52ddfca95590548b7b64507740551abf, type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
   m_ValidKeywords: []
@@ -23,23 +23,18 @@ Material:
   m_SavedProperties:
     serializedVersion: 3
     m_TexEnvs:
-    - _BaseMap:
-        m_Texture: {fileID: 2800000, guid: 4cd7cfbb985ec4518bfc6c73c4ee1433, type: 3}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
     - _MainTex:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
-    - _Metallic: 0.5
-    - _RimBrightness: 10
-    - _RimPower: 4
-    - _Smoothness: 0.5
+    - _PixelSnap: 0
+    - _ShadowAngle: 270
+    - _ShadowDistance: 0.24
     m_Colors:
-    - _BaseColor: {r: 1, g: 1, b: 1, a: 1}
-    - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
-    - _RimColor: {r: 1, g: 0, b: 0, a: 1}
+    - _Color: {r: 1, g: 1, b: 1, a: 1}
+    - _ShadowColor: {r: 0, g: 0, b: 0, a: 0.6}
+    - _ShadowOffset: {r: 3.42, g: 1.31, b: 1.68, a: 1.94}
   m_BuildTextureStacks: []
   m_AllowLocking: 1

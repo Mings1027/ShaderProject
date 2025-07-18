@@ -16,7 +16,7 @@ Material:
   - _BLENDMODE_ADDITIVE
   - _DISTANCE_ON
   - _Halo_ON
-  - _SCREENSHADOWS_OFF
+  - _SCREENSHADOWS_LOW
   - _TEXTUREPACKING_RED
   m_InvalidKeywords:
   - DISTANCEFADE_ON
@@ -48,26 +48,26 @@ Material:
     - _AccurateColors: 1
     - _BlendMode: 0
     - _Blendmode: 0
-    - _CloseFade: 0.5
-    - _CloseTransition: 10
+    - _CloseFade: 0
+    - _CloseTransition: 0
     - _DayFading: 0
     - _DepthWrite: 0
     - _DistanceFade: 1
     - _DitherIntensity: 0.743
     - _DitheringPattern: 0
     - _DstBlend: 1
-    - _FarFade: 59
-    - _FarTransition: 30.2
+    - _FarFade: 210
+    - _FarTransition: 51
     - _FlickerIntensity: 1
     - _FlickerSoftness: 1
     - _FlickerSpeed: 1
     - _Flickering: 0
     - _Halo: 1
     - _HaloDepthFade: 0.5
-    - _HaloPosterize: 50
-    - _HaloSize: 1.01
-    - _LightPosterize: 0
-    - _LightSoftness: 0.671
+    - _HaloPosterize: 0
+    - _HaloSize: 2
+    - _LightPosterize: 50
+    - _LightSoftness: 0.7
     - _Noise: 0
     - _NoiseMovement: 0.4
     - _NoiseScale: 0.54
@@ -75,7 +75,7 @@ Material:
     - _ParticleMode: 0
     - _RandomOffset: 0
     - _ReceiveShadows: 1
-    - _ScreenShadows: 0
+    - _ScreenShadows: 1
     - _ShadingBlend: 0.15
     - _ShadingSoftness: 0.5
     - _ShadowThreshold: 0.5
@@ -89,7 +89,7 @@ Material:
     - ___Noise___: 0
     m_Colors:
     - _FlickerHue: {r: 0, g: 0.023825645, b: 1, a: 1}
-    - _HaloTint: {r: 8, g: 8, b: 8, a: 1}
-    - _LightTint: {r: 4.489981, g: 4.489981, b: 4.489981, a: 1}
+    - _HaloTint: {r: 5.9921575, g: 5.9921575, b: 5.9921575, a: 1}
+    - _LightTint: {r: 1.4980392, g: 1.4980392, b: 1.4980392, a: 1}
   m_BuildTextureStacks: []
   m_AllowLocking: 1
