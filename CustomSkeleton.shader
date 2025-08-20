@@ -8,7 +8,6 @@ Shader "Spine/Skeleton"
         [HideInInspector] _StencilRef("Stencil Reference", Float) = 1.0
         [HideInInspector][Enum(UnityEngine.Rendering.CompareFunction)] _StencilComp("Stencil Comparison", Float) = 8 // Set to Always as default
 
-        // Outline properties are drawn via custom editor.
         [HideInInspector] _OutlineWidth("Outline Width", Range(0,8)) = 3.0
         [HideInInspector] _OutlineColor("Outline Color", Color) = (1,1,0,1)
         [HideInInspector] _OutlineReferenceTexWidth("Reference Texture Width", Int) = 1024
@@ -18,8 +17,6 @@ Shader "Spine/Skeleton"
         [HideInInspector] _OutlineOpaqueAlpha("Opaque Alpha", Range(0,1)) = 1.0
         [HideInInspector] _OutlineMipLevel("Outline Mip Level", Range(0,3)) = 0
 
-        _OutlineThreshold("Outline Threshold", Range(0, 1)) = 0.5
-        _OutlineSmoothFactor ("Outline Smooth Factor", Range(0, 1)) = 0.5
     }
 
     SubShader
@@ -33,6 +30,7 @@ Shader "Spine/Skeleton"
         {
             Mode Off
         }
+
         Cull Off
         ZWrite Off
         Blend One OneMinusSrcAlpha
@@ -51,14 +49,14 @@ Shader "Spine/Skeleton"
 
             HLSLPROGRAM
             #pragma shader_feature _ _STRAIGHT_ALPHA_INPUT
+
             #pragma vertex vert
             #pragma fragment frag
-            // #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
-            #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Lighting.hlsl"
-            sampler2D _MainTex;
 
-            float _OutlineThreshold;
-            float _OutlineSmoothFactor;
+            #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
+            #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Lighting.hlsl"
+
+            sampler2D _MainTex;
 
             struct VertexInput
             {
@@ -85,7 +83,7 @@ Shader "Spine/Skeleton"
             inline half4 PMAGammaToTargetSpace(half4 gammaPMAColor)
             {
                 #if UNITY_COLORSPACE_GAMMA
-	return gammaPMAColor;
+                    return gammaPMAColor;
                 #else
                 return gammaPMAColor.a == 0
                            ? half4(GammaToLinearSpace(gammaPMAColor.rgb), gammaPMAColor.a)
@@ -102,108 +100,110 @@ Shader "Spine/Skeleton"
                 output.vertexColor = PMAGammaToTargetSpace(input.vertexColor);
                 output.normal = TransformObjectToWorldNormal(input.normal);
                 output.worldPos = TransformObjectToWorld(input.vertex.xyz);
+
                 return output;
+            }
+
+            float3 CalculateMainLight(float3 normal)
+            {
+                Light mainLight = GetMainLight();
+                float NdotL = max(0, dot(normal, mainLight.direction));
+
+                // 제일앞에 mainLight.color 빼면 Directional Light꺼도 영향안받음
+                return mainLight.color * mainLight.shadowAttenuation + mainLight.color * NdotL;
+            }
+
+            float3 CalculateAdditionalLight(float3 worldPos, float3 normal)
+            {
+                int lightCount = GetAdditionalLightsCount();
+                float3 additionalLights = 0;
+                for (int j = 0; j < lightCount; j++)
+                {
+                    Light additionalLight = GetAdditionalLight(j, worldPos);
+                    float NdotL = max(0, dot(normal, additionalLight.direction));
+                    additionalLights += additionalLight.color * NdotL * additionalLight.distanceAttenuation *
+                        additionalLight.shadowAttenuation;
+                }
+                return additionalLights;
             }
 
             float4 frag(VertexOutput i) : SV_Target
             {
                 float4 texColor = tex2D(_MainTex, i.uv);
-                
+
                 #if defined(_STRAIGHT_ALPHA_INPUT)
                 texColor.rgb *= texColor.a;
                 #endif
-                
+
                 float3 normalWS = normalize(i.normal);
-                Light mainLight = GetMainLight();
-                
-                // Directional Light 조명 계산
-                float ndl = max(0, dot(normalWS, mainLight.direction));
-                float3 diffuseColor = mainLight.color * ndl;
-                
-                // 추가적인 라이트 조명 계산
-                int lightCount = GetAdditionalLightsCount();
-                for (int j = 0; j < lightCount; j++)
-                {
-                    Light additionalLight = GetAdditionalLight(j, i.worldPos);
-                    float ndlAdd = max(0, dot(normalWS, additionalLight.direction));
-                    diffuseColor += additionalLight.color * ndlAdd * additionalLight.distanceAttenuation *
-                        additionalLight.shadowAttenuation;
-                }
-                
-                float lightIntensity = mainLight.shadowAttenuation + dot(normalWS, mainLight.direction) * 0.5 + 0.5;
-                // 메인 라이트 강도
-                for (int j = 0; j < lightCount; j++)
-                {
-                    Light additionalLight = GetAdditionalLight(j, i.worldPos);
-                    lightIntensity += additionalLight.shadowAttenuation * (dot(normalWS, additionalLight.direction) *
-                        0.5 + 0.5) * additionalLight.distanceAttenuation; // 추가 라이트 강도
-                }
-                lightIntensity = saturate(lightIntensity);
 
-                float alphaFactor = 1.0;
-                if (texColor.a < _OutlineThreshold)
-                {
-                    alphaFactor = saturate(texColor.a / _OutlineThreshold + lightIntensity * _OutlineSmoothFactor);
-                }
+                float3 mainLight = CalculateMainLight(normalWS);
 
-                float3 finalColor = (mainLight.color * mainLight.shadowAttenuation + diffuseColor) * (texColor.rgb * i.
-                                                         vertexColor.rgb);
-                
-                return float4(finalColor, texColor.a * i.vertexColor.a * alphaFactor);
+                float3 additionalLights = CalculateAdditionalLight(i.worldPos, normalWS);
+
+                float3 finalColor = (mainLight + additionalLights) * (texColor.rgb * i.vertexColor.rgb);
+
+                return float4(finalColor, texColor.a * i.vertexColor.a);
             }
             ENDHLSL
         }
 
-        Pass
-        {
-            Name "Caster"
-            Tags
-            {
-                "LightMode"="ShadowCaster"
-            }
-            Offset 1, 1
-            ZWrite On
-            ZTest LEqual
-
-            Fog
-            {
-                Mode Off
-            }
-            Cull Off
-            Lighting Off
-
-            HLSLPROGRAM
-            #pragma vertex vert
-            #pragma fragment frag
-            #pragma multi_compile_shadowcaster
-            #pragma fragmentoption ARB_precision_hint_fastest
-            #include "UnityCG.cginc"
-            sampler2D _MainTex;
-            fixed _Cutoff;
-
-            struct VertexOutput
-            {
-                V2F_SHADOW_CASTER;
-                float4 uvAndAlpha : TEXCOORD1;
-            };
-
-            VertexOutput vert(appdata_base v, float4 vertexColor : COLOR)
-            {
-                VertexOutput o;
-                o.uvAndAlpha = v.texcoord;
-                o.uvAndAlpha.a = vertexColor.a;
-                TRANSFER_SHADOW_CASTER(o)
-                return o;
-            }
-
-            float4 frag(VertexOutput i) : SV_Target
-            {
-                fixed4 texcol = tex2D(_MainTex, i.uvAndAlpha.xy);
-                clip(texcol.a * i.uvAndAlpha.a - _Cutoff);
-                SHADOW_CASTER_FRAGMENT(i)
-            }
-            ENDHLSL
-        }
+        //        Pass
+        //        {
+        //            Name "Caster"
+        //            Tags
+        //            {
+        //                "LightMode"="ShadowCaster"
+        //            }
+        //
+        //            Offset 1, 1
+        //            ZWrite On
+        //            ZTest LEqual
+        //
+        //            Fog
+        //            {
+        //                Mode Off
+        //            }
+        //
+        //            Cull Off
+        //            Lighting Off
+        //
+        //            HLSLPROGRAM
+        //            #pragma vertex vert
+        //            #pragma fragment frag
+        //            #pragma multi_compile_shadowcaster
+        //            #pragma fragmentoption ARB_precision_hint_fastest
+        //
+        //            #include "UnityCG.cginc"
+        //
+        //            sampler2D _MainTex;
+        //            fixed _Cutoff;
+        //
+        //            struct VertexOutput
+        //            {
+        //                V2F_SHADOW_CASTER;
+        //                float4 uvAndAlpha : TEXCOORD1;
+        //            };
+        //
+        //            VertexOutput vert(appdata_base v, float4 vertexColor : COLOR)
+        //            {
+        //                VertexOutput o;
+        //                o.uvAndAlpha = v.texcoord;
+        //                o.uvAndAlpha.a = vertexColor.a;
+        //                TRANSFER_SHADOW_CASTER(o)
+        //
+        //                return o;
+        //            }
+        //
+        //            float4 frag(VertexOutput i) : SV_Target
+        //            {
+        //                fixed4 texcol = tex2D(_MainTex, i.uvAndAlpha.xy);
+        //                clip(texcol.a * i.uvAndAlpha.a - _Cutoff);
+        //                SHADOW_CASTER_FRAGMENT(i)
+        //            }
+        //            ENDHLSL
+        //        }
     }
     CustomEditor "SpineShaderWithOutlineGUI"
+
 }
