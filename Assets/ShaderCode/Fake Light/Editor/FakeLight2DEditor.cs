@@ -136,7 +136,7 @@ namespace ShaderCode.FPL
             int currentFold = 0;
             for (int i = 0; i < properties.Length; i++)
             {
-                if (( properties[i].flags & ( MaterialProperty.PropFlags.HideInInspector | MaterialProperty.PropFlags.PerRendererData ) ) == MaterialProperty.PropFlags.None)
+                if (( properties[i].propertyFlags & ( UnityEngine.Rendering.ShaderPropertyFlags.HideInInspector | UnityEngine.Rendering.ShaderPropertyFlags.PerRendererData ) ) == UnityEngine.Rendering.ShaderPropertyFlags.None)
                 {
                     if (properties[i].name == "_Halo") currentFold++;
                     else if (properties[i].name == "_ParticleMode") currentFold++;

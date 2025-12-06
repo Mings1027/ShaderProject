@@ -16,6 +16,7 @@ Material:
   - _BLENDMODE_ADDITIVE
   - _DISTANCE_ON
   - _Halo_ON
+  - _SPECULARHIGHLIGHT_ON
   m_InvalidKeywords:
   - _TEXTUREPACKING_RED
   m_LightmapFlags: 4
@@ -54,11 +55,11 @@ Material:
     - _Flickering: 0
     - _Halo: 1
     - _HaloDepthFade: 0.5
-    - _HaloPosterize: 0
+    - _HaloPosterize: 62
     - _HaloSize: 1.06
     - _IsOrthographic: 0
-    - _LightPosterize: 0
-    - _LightSoftness: 1
+    - _LightPosterize: 48
+    - _LightSoftness: 0.81
     - _Noise: 0
     - _NoiseMovement: 0.35
     - _NoiseScale: 1
@@ -70,7 +71,7 @@ Material:
     - _SizeFlickering: 0.049
     - _SpecIntensity: 0.526
     - _SpecPower: 101
-    - _SpecularHighlight: 0
+    - _SpecularHighlight: 1
     - _SrcBlend: 5
     - _Test: 0
     - _TexturePacking: 0

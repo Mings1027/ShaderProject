@@ -41,8 +41,8 @@ namespace FPL
             {"Light Tint", "Controls the color, intensity and opacity of the Light."},
             {"Light Softness", "Controls the attenuation of the Light."},
             {"Light Posterize", "Posterizes the Light for a more stylized look."},
-            {"Shading Blend", "Controls how much light bleeds through surfaces. 0 = fully shaded, 1= fully lit. (Requires Unity’s “DepthNormalTexture” for shading)"},
-            {"Shading Softness", "Controls how harsh or soft the shading is.(Requires Unity’s “DepthNormalTexture” for shading)"},
+            {"Shading Blend", "Controls how much light bleeds through surfaces. 0 = fully shaded, 1= fully lit. (Requires Unityï¿½s ï¿½DepthNormalTextureï¿½ for shading)"},
+            {"Shading Softness", "Controls how harsh or soft the shading is.(Requires Unityï¿½s ï¿½DepthNormalTextureï¿½ for shading)"},
 
             {"Halo Tint", "Controls the color, intensity and opacity of the Halo."},
             {"Halo Size", "Controls the size of the Halo."},
@@ -75,7 +75,7 @@ namespace FPL
             {"Screen Shadows (HEAVY)", "Heavy experimental screen space effect. Use at your own risks. (Not recommended for low end devices)"},
             {"Shadow Threshold", "Controls the shadow collision threshold. (small values might cause artifacts)"},
 
-            {"Particle Mode", "Makes the light compatible with Particle Systems. *Read “Particle Setup” documentation for more info."},
+            {"Particle Mode", "Makes the light compatible with Particle Systems. *Read ï¿½Particle Setupï¿½ documentation for more info."},
 
             {"Accurate Colors", "Blends the light with the opaque texture for a more accurate lighting style instead of superimposing the light."},
 
@@ -135,7 +135,7 @@ namespace FPL
             int currentFold = 0;
             for (int i = 0; i < properties.Length; i++)
             {
-                if (( properties[i].flags & ( MaterialProperty.PropFlags.HideInInspector | MaterialProperty.PropFlags.PerRendererData ) ) == MaterialProperty.PropFlags.None)
+                if (( properties[i].propertyFlags & ( UnityEngine.Rendering.ShaderPropertyFlags.HideInInspector | UnityEngine.Rendering.ShaderPropertyFlags.PerRendererData ) ) == UnityEngine.Rendering.ShaderPropertyFlags.None)
                 {
                     if (properties[i].name == "___Halo___") currentFold++;
                     else if (properties[i].name == "_ParticleMode") currentFold++;
